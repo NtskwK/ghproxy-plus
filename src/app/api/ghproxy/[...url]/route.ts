@@ -67,10 +67,10 @@ export async function GET(request: Request) {
   log("new url:", path);
   if (
     path.search(exp1) === 0 ||
-    path.search(exp5) === 0 ||
-    path.search(exp6) === 0 ||
     path.search(exp3) === 0 ||
-    path.search(exp4) === 0
+    path.search(exp4) === 0 ||
+    path.search(exp5) === 0 ||
+    path.search(exp6) === 0
   ) {
     return httpHandler(request, path);
   } else if (path.search(exp2) === 0) {
