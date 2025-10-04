@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -21,16 +20,14 @@ import Combobox from "./combobox";
 import { GhRelease } from "@/lib/ghResponse";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
-
-interface ApiResponse {
-  message: string;
-}
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
-type GetAssetsFormValues = z.infer<typeof GetAssetsFormSchema>;
 
 export default function HelloPage() {
-  const [message, setMessage] = useState("Loading...");
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [submitResult, setSubmitResult] = useState<string>("");
   const [tag, setTag] = useState("");
   const [tagList, setTagList] = useState([
@@ -49,23 +46,22 @@ export default function HelloPage() {
     },
   });
 
-  const getAssetsForm = useForm<GetAssetsFormValues>({
-    resolver: zodResolver(GetAssetsFormSchema),
-    mode: "onChange",
-    defaultValues: {
-      user: "placeholder",
-      repo: "placeholder",
-      tag: "None",
-    },
-  });
+  const updateSearchParams = (key: string, value: string) => {
+    const params = new URLSearchParams(window.location.search);
+    if (value) {
+      params.set(key, value);
+    } else {
+      params.delete(key);
+    }
+    router.push(`?${params.toString()}`);
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/hello");
-      const { message } = (await res.json()) as ApiResponse;
-      setMessage(message);
-    };
-    fetchData();
+    const url = searchParams.get("repo");
+    if (url) {
+      checkForm.setValue("repoUrl", url);
+      checkForm.handleSubmit(onSubmitGetReleases)();
+    }
   }, []);
 
   useEffect(() => {
@@ -109,6 +105,7 @@ export default function HelloPage() {
         setTag(tagNames[0].releaseId);
         setReleases(releases);
 
+        updateSearchParams("repo", values.repoUrl);
         setSubmitResult("");
       })
       .catch((error) => {
