@@ -16,7 +16,14 @@ interface GhRepo {
 }
 
 export function extractRepoFromURL(url: string): GhRepo | null {
-  const match = url.match(/(?:https?:\/\/)?github\.com\/([^\/]+)\/([^\/?#]+)/);
+  // anti injection
+  if (!url.startsWith("https://github.com")
+    && !url.startsWith("http://github.com")
+    && !url.startsWith("github.com")) {
+      return null;
+    }
+
+  const match = url.match(/^(?:https?:\/\/)?github\.com\/([^\/]+)\/([^\/?#]+)$/);
   if (match) {
     return {
       owner: match[1],
