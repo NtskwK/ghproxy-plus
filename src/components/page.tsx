@@ -15,9 +15,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { extractRepoFromURL } from "@/lib/utils";
-import { getRepoTags } from "@/lib/ghApi";
+import { getRepoReleases, getRepoTags } from "@/lib/ghApi";
 import { CheckFormSchema, GetAssetsFormSchema } from "./lib";
 import Combobox from "./combobox";
+import { GhRelease } from "@/lib/ghResponse";
+import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { CheckCircle2Icon } from "lucide-react";
 
 interface ApiResponse {
   message: string;
@@ -29,7 +32,15 @@ type GetAssetsFormValues = z.infer<typeof GetAssetsFormSchema>;
 export default function HelloPage() {
   const [message, setMessage] = useState("Loading...");
   const [submitResult, setSubmitResult] = useState<string>("");
-  const [tagList, setTagList] = useState([{ label: "None", value: "None" }]);
+  const [tag, setTag] = useState("");
+  const [tagList, setTagList] = useState([
+    { label: "None", releaseId: "None" },
+  ]);
+  const [releases, setReleases] = useState<GhRelease[]>([]);
+  const [asset, setAsset] = useState("");
+  const [assetList, setAssetList] = useState([
+    { label: "None", value: "None" },
+  ]);
 
   const checkForm = useForm<CheckFormValues>({
     resolver: zodResolver(CheckFormSchema),
@@ -40,10 +51,11 @@ export default function HelloPage() {
 
   const getAssetsForm = useForm<GetAssetsFormValues>({
     resolver: zodResolver(GetAssetsFormSchema),
+    mode: "onChange",
     defaultValues: {
-      user: "",
-      repo: "",
-      tag: "",
+      user: "placeholder",
+      repo: "placeholder",
+      tag: "None",
     },
   });
 
@@ -56,50 +68,82 @@ export default function HelloPage() {
     fetchData();
   }, []);
 
-  const onSubmitCheck = async (values: CheckFormValues) => {
-    setSubmitResult(`Checking repo: ${values.repoUrl}`);
+  useEffect(() => {
+    if (tag === "None" || tag === "") {
+      setAssetList([{ label: "None", value: "None" }]);
+      return;
+    }
+
+    const release = releases.find((release) => release.id.toString() === tag);
+    if (release) {
+      const assets = release.assets.map((asset) => ({
+        label: asset.name,
+        value: asset.browser_download_url,
+      }));
+      setAssetList(assets);
+      setAsset(assets[0]?.value || "");
+    }
+  }, [tag]);
+
+  const onSubmitGetReleases = async (values: CheckFormValues) => {
     const repo = extractRepoFromURL(values.repoUrl);
     if (!repo) {
       setSubmitResult("❌ Invalid GitHub repo URL.");
       return;
     }
 
-    getRepoTags(repo.owner, repo.repo)
-      .then((tags) => {
-        if (tags.length === 0) {
-          setSubmitResult("❌ No tags found in the repo.");
+    getRepoReleases(repo.owner, repo.repo)
+      .then((releases) => {
+        if (releases.length === 0) {
+          setSubmitResult("❌ No releases found in the repo.");
+          setTagList([{ label: "None", releaseId: "None" }]);
+          setAssetList([{ label: "None", value: "None" }]);
           return;
         }
-        const tagNames = tags.map((tag) => ({
-          label: tag.name,
-          value: tag.name,
+        const tagNames = releases.map((release) => ({
+          label: release.name,
+          releaseId: release.id.toString(),
         }));
         tagNames[0].label += " (latest)";
         setTagList(tagNames.slice(0, 5)); // Show only first 5 tags
+        setTag(tagNames[0].releaseId);
+        setReleases(releases);
 
-        console.log("Fetched tags:", tags);
+        setSubmitResult("");
       })
       .catch((error) => {
         setSubmitResult(`❌ Error fetching tags: ${error}`);
+        setTagList([{ label: "None", releaseId: "None" }]);
+        setAssetList([{ label: "None", value: "None" }]);
+        setReleases([]);
       });
   };
 
-  const onSubmitDownload = async () => {
-    console.log("Downloading...");
-  };
+  const handleDownload = async () => {
+    if (!asset) {
+      setSubmitResult("❌ No asset selected.");
+      return;
+    }
 
-  const setTag = (value: string) => {
-    getAssetsForm.setValue("tag", value);
+    console.log("Downloading asset from URL:", asset);
   };
 
   return (
     <>
       {/* Main Content */}
-      <main className="flex-1 container mx-auto p-6 flex flex-col items-center justify-center gap-6">
-        <div className="w-full max-w-xl space-y-4">
+      <main className="flex-1 container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6 flex flex-col items-center justify-center gap-6 space-y-4">
+        <div className="w-[80%] sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl space-y-10">
+          {submitResult && (
+            <Alert variant="destructive">
+              <CheckCircle2Icon />
+              <AlertTitle>Fail to fetch releases</AlertTitle>
+              <AlertDescription>{submitResult}</AlertDescription>
+            </Alert>
+          )}
+
           <Form {...checkForm}>
             <form
-              onSubmit={checkForm.handleSubmit(onSubmitCheck)}
+              onSubmit={checkForm.handleSubmit(onSubmitGetReleases)}
               className="space-y-4"
             >
               <FormField
@@ -130,27 +174,26 @@ export default function HelloPage() {
               />
             </form>
           </Form>
-        </div>
 
-        <Form {...getAssetsForm}>
-          <form
-            onSubmit={getAssetsForm.handleSubmit(onSubmitDownload)}
-            className="space-y-6 flex flex-col items-center justify-center"
-          >
-            <FormField
-              control={getAssetsForm.control}
-              name="tag"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel>Tag</FormLabel>
-                  <Combobox field={field} options={tagList} setter={setTag} />
-                  <FormMessage />
-                </FormItem>
-              )}
+          <div className="flex flex-col gap-2 space-y-8">
+            <Combobox
+              getter={{ value: tag }}
+              options={tagList.map((tag) => ({
+                label: tag.label,
+                value: tag.releaseId,
+              }))}
+              setter={setTag}
+              defaultValue="Select tag"
             />
-            <Button type="submit">Search</Button>
-          </form>
-        </Form>
+            <Combobox
+              getter={{ value: asset }}
+              options={assetList}
+              setter={setAsset}
+              defaultValue="Select download asset"
+            />
+            <Button onClick={handleDownload}>Download</Button>
+          </div>
+        </div>
       </main>
     </>
   );
