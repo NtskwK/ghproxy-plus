@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/form";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { extractRepoFromURL } from "@/lib/utils";
 import { getRepoReleases } from "@/lib/ghApi";
@@ -41,7 +40,7 @@ export default function HelloPage() {
   ]);
 
   const checkForm = useForm<CheckFormValues>({
-    resolver: zodResolver(CheckFormSchema),
+    // don't use resolver here to avoid packup error
     defaultValues: {
       repoUrl: "",
     },
@@ -111,6 +110,9 @@ export default function HelloPage() {
   const onSubmitGetReleases = async (values: CheckFormValues) => {
     const repo = extractRepoFromURL(values.repoUrl);
     if (!repo) {
+      setAssetList([{ label: "None", value: "None" }]);
+      setTagList([{ label: "None", releaseId: "None" }]);
+      setReleases([]);
       setSubmitResult("❌ Invalid GitHub repo URL.");
       return;
     }
