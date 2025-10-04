@@ -14,8 +14,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { extractRepoFromURL } from "@/lib/utils";
-import { getRepoReleases, getRepoTags } from "@/lib/ghApi";
-import { CheckFormSchema, GetAssetsFormSchema } from "./lib";
+import { getRepoReleases } from "@/lib/ghApi";
+import { CheckFormSchema } from "./lib";
 import Combobox from "./combobox";
 import { GhRelease } from "@/lib/ghResponse";
 import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
@@ -137,7 +137,7 @@ export default function HelloPage() {
       });
   };
 
-  const handleDownload = async () => {
+  const generateDownloadUrl = () => {
     if (!asset) {
       setSubmitResult("❌ No asset selected.");
       return;
@@ -149,12 +149,26 @@ export default function HelloPage() {
 
     const baseUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
     const url = baseUrl + "/api/ghproxy/" + asset;
+    console.log("Generated URL: ", url);
+    return url;
+  };
+
+  const handleDownload = () => {
+    const url = generateDownloadUrl();
+    if (!url) return;
+
     const link = document.createElement("a");
     link.href = url;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    console.log("Downloading asset from URL:", url);
+  };
+
+  const handleCopyDownloadUrl = async () => {
+    const url = generateDownloadUrl();
+    if (!url) return;
+    await navigator.clipboard.writeText(url);
+    alert("Download URL copied to clipboard!");
   };
 
   return (
@@ -221,6 +235,9 @@ export default function HelloPage() {
               defaultValue="Select download asset"
             />
             <Button onClick={handleDownload}>Download</Button>
+            <Button onClick={handleCopyDownloadUrl}>
+              Generate Download URL
+            </Button>
           </div>
         </div>
       </main>
