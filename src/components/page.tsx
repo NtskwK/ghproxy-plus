@@ -128,8 +128,13 @@ export default function HelloPage() {
 
     const baseUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
     const url = baseUrl + "/api/ghproxy/" + asset;
-
-    fetch(url);
+    // 通过创建 a 标签实现下载
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = ""; // 可选：可设置文件名
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
     console.log("Downloading asset from URL:", url);
   };
 
