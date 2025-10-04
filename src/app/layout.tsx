@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Header from "./_components/header";
+import Footer from "./_components/footer";
 
 export const metadata: Metadata = {
   title: "Hono | nextjs",
@@ -12,8 +14,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="zh-CN">
+      <head>
+        <title>ghproxy plus</title>
+      </head>
+      <body className="font-sans antialiased">
+        <div className="min-h-screen flex flex-col bg-background">
+          <Header />
+          {children}
+          <Footer />
+        </div>
+      </body>
     </html>
   );
 }
