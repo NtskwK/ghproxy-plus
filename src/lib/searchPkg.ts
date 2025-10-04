@@ -1,0 +1,138 @@
+import { IOS, UAParser } from "ua-parser-js";
+import { GhReleaseAssets } from "./ghResponse";
+import { CPUArchitecture, getOSandArch } from "./utils";
+
+const searchAsset = (
+  keywords: string[],
+  assets: GhReleaseAssets[]
+): GhReleaseAssets | undefined => {
+  if (!keywords || keywords.length === 0) {
+    return undefined;
+  }
+
+  const results = assets.filter((asset) =>
+    asset.name.toLowerCase().includes(keywords[0].toLowerCase())
+  );
+
+  if (results.length === 1) {
+    return results[0];
+  }
+
+  if (results.length > 1) {
+    if (keywords.length > 1) {
+      return searchAsset(keywords.slice(1), results);
+    } else {
+      return results[0];
+    }
+  }
+
+  if (results.length < 1) {
+    if (keywords.length > 1) {
+      return searchAsset(keywords.slice(1), assets);
+    } else {
+      return undefined;
+    }
+  }
+};
+
+/**
+ * Get the keywords for searching assets based on the OS and architecture.
+ *
+ * os: https://docs.uaparser.dev/info/os/name.html
+ *
+ * arch: https://docs.uaparser.dev/info/cpu/arch.html
+ * @param os - operating system
+ * @param arch - CPU architecture
+ * @returns keywords array
+ */
+const getKeywords = (
+  osName: string | undefined,
+  arch: CPUArchitecture
+): string[] => {
+  const keywords: string[] = [];
+  if (arch) {
+    keywords.push(arch.toLowerCase());
+    if (arch.toLowerCase() === "amd64") {
+      keywords.push("x64", "x86_64");
+    } else if (arch.toLowerCase() === "ia32") {
+      keywords.push("i386", "x86");
+    } else if (arch.toLowerCase() === "arm64") {
+      keywords.push("aarch64", "armv8", "armv8l");
+    } else if (arch.toLowerCase() === "arm") {
+      keywords.push("armv7", "armv7l", "armhf");
+    }
+  }
+
+  if (osName) {
+    if (osName.toLowerCase() === "android") {
+      keywords.push("android", "armv8", "apk");
+    } else if (osName.toLowerCase() === "arch") {
+      keywords.push("archlinux", "unknown");
+    } else if (osName.toLowerCase() === "freebsd") {
+      keywords.push("freebsd");
+    } else if (osName.toLowerCase() === "gnu") {
+      keywords.push("gnu", "linux", "unknown");
+    } else if (osName.toLowerCase() === "harmonyos") {
+      keywords.push("hap");
+    } else if (osName.toLowerCase() === "ios") {
+      keywords.push("ios", "ipa");
+    } else if (osName.toLowerCase() === "macos") {
+      keywords.push("macos", "darwin", "dmg", "aarch64");
+    } else if (
+      osName.toLowerCase() === "debian" ||
+      osName.toLowerCase() === "ubuntu" ||
+      osName.toLowerCase() === "mint" ||
+      osName.toLowerCase() === "deepin"
+    ) {
+      keywords.push("debian", "unknown", "deb", "ubuntu", "mint");
+    } else if (
+      osName.toLowerCase() === "centos" ||
+      osName.toLowerCase() === "redhat"
+    ) {
+      keywords.push("centos", "el", "rhel", "rpm");
+    } else if (osName.toLowerCase() === "linux") {
+      keywords.push("unknown", "linux");
+    } else if (osName.toLowerCase() === "windows") {
+      keywords.push("windows", "win32", "win64", "win", "exe", "msi", "zip");
+    }
+  }
+
+  keywords.push("tar.gz", "zip");
+  return keywords;
+};
+
+const getDownloadAsset = (
+  assets: GhReleaseAssets[],
+  ua: string | undefined,
+  keyword: string | undefined
+): GhReleaseAssets | undefined => {
+  if (assets.length === 0) {
+    return undefined;
+  }
+
+  if (assets.length <= 2 && ua === undefined && keyword === undefined) {
+    const tarAsset = searchAsset(["tar.gz"], assets);
+    if (tarAsset) {
+      return tarAsset;
+    } else {
+      return assets[0];
+    }
+  }
+
+  if (keyword) {
+    const asset = searchAsset([keyword], assets);
+    if (asset) {
+      return asset;
+    } else {
+      // If the keyword search fails, fall back to UA parsing
+    }
+  }
+
+  if (!ua) {
+    return assets[0];
+  }
+
+  const { os, arch } = getOSandArch(ua);
+  const keywords = getKeywords(os, arch);
+  return searchAsset(keywords, assets);
+};

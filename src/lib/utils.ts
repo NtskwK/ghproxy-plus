@@ -1,5 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { IOS, UAParser } from "ua-parser-js";
+import { CPUArch } from "ua-parser-js/enums";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -20,3 +22,24 @@ export function extractRepoFromURL(url: string): GhRepo | null {
   }
   return null;
 }
+
+/**
+ * Get the operating system and architecture from a user agent string.
+ * @param ua - user agent string
+ * @returns os and architecture
+ * os: https://docs.uaparser.dev/info/os/name.html
+ * arch: https://docs.uaparser.dev/info/cpu/arch.html
+ */
+export function getOSandArch(ua: string): {
+  os: string | undefined;
+  arch: CPUArchitecture;
+} {
+  const parser = new UAParser(ua);
+  const os = parser.getOS().name;
+  const arch = parser.getCPU().architecture as CPUArchitecture | undefined;
+  return { os, arch };
+}
+
+export type CPUArchitecture =
+  | (typeof CPUArch)[keyof typeof CPUArch]
+  | undefined;
