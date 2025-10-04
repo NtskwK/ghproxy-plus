@@ -3,6 +3,9 @@ import { twMerge } from "tailwind-merge";
 import { IOS, UAParser } from "ua-parser-js";
 import { CPUArch } from "ua-parser-js/enums";
 
+export const isClient = typeof window !== "undefined";
+export const isServer = !isClient;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }

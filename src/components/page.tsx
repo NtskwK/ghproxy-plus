@@ -48,7 +48,6 @@ export default function HelloPage() {
   });
 
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
-  // 使用 searchParams 来获取 keyword，这样会响应 URL 变化
   const keyword = searchParams.get("keyword") || "";
 
   const updateSearchParams = (key: string, value: string) => {
@@ -67,7 +66,7 @@ export default function HelloPage() {
       checkForm.setValue("repoUrl", url);
       checkForm.handleSubmit(onSubmitGetReleases)();
     }
-  }, [searchParams]); // 添加 searchParams 依赖
+  }, [searchParams]);
 
   useEffect(() => {
     if (tag === "None" || tag === "") {
@@ -91,9 +90,8 @@ export default function HelloPage() {
         setAsset(downloadAsset.browser_download_url);
       }
     }
-  }, [tag, releases, ua, keyword]); // 添加所有相关依赖项
+  }, [tag, releases, ua, keyword]);
 
-  // 当 keyword 变化时，重新计算最佳匹配的 asset
   useEffect(() => {
     if (tag && tag !== "None" && tag !== "" && releases.length > 0) {
       const release = releases.find((release) => release.id.toString() === tag);
@@ -108,7 +106,7 @@ export default function HelloPage() {
         }
       }
     }
-  }, [keyword, ua]); // 当 keyword 或 ua 变化时重新计算
+  }, [keyword, ua]);
 
   const onSubmitGetReleases = async (values: CheckFormValues) => {
     const repo = extractRepoFromURL(values.repoUrl);
@@ -151,7 +149,6 @@ export default function HelloPage() {
         setTagList(tagNames.slice(0, 5)); // Show only first 5 tags
         setTag(tagNames[0].releaseId);
         setReleases(releases);
-
         updateSearchParams("repo", values.repoUrl);
         setSubmitResult("");
 
