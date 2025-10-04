@@ -1,6 +1,4 @@
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-
+"use client";
 const Footer = () => {
   return (
     <footer className="bg-muted/50 border-t mt-auto">
