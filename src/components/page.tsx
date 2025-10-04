@@ -125,7 +125,15 @@ export default function HelloPage() {
       return;
     }
 
-    console.log("Downloading asset from URL:", asset);
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    const port = window.location.port;
+
+    const baseUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
+    const url = baseUrl + "/api/ghproxy/" + asset;
+
+    fetch(url);
+    console.log("Downloading asset from URL:", url);
   };
 
   return (
