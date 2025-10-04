@@ -2,11 +2,30 @@ import z from "zod";
 
 export const CheckFormSchema = z.object({
   repoUrl: z
-    .url("Invalid URL!")
-    .refine(
-      (url) => url.includes("github.com"),
-      "Please enter a GitHub repo URL!"
-    ),
+    .string()
+    .refine((url) => {
+      // 预处理：如果没有协议头，临时添加https://用于验证
+      const urlWithProtocol =
+        url.startsWith("http://") || url.startsWith("https://")
+          ? url
+          : `https://${url}`;
+
+      // 验证是否为有效的URL格式
+      try {
+        new URL(urlWithProtocol);
+        return true;
+      } catch {
+        return false;
+      }
+    }, "Invalid URL format!")
+    .refine((url) => {
+      return url.includes("github.com");
+    }, "Please enter a GitHub repo URL!")
+    .transform((url) => {
+      return url.startsWith("http://") || url.startsWith("https://")
+        ? url
+        : `https://${url}`;
+    }),
 });
 
 export const GetAssetsFormSchema = z.object({
