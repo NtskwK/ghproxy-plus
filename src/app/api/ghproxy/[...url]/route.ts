@@ -24,7 +24,8 @@ import { NextResponse } from "next/server";
 import { log } from "node:console";
 
 // 前缀，如果自定义路由为example.com/gh/*，将PREFIX改为 '/gh/'，注意，少一个杠都会错！
-const PREFIX = "/api/ghproxy/";
+import { GHPROXY_PATH } from "@/lib/utils";
+
 // 分支文件使用jsDelivr镜像的开关，0为关闭，默认关闭
 const Config = {
   jsdelivr: 0,
@@ -74,11 +75,14 @@ export async function GET(request: Request) {
   const urlObj = new URL(urlStr);
   let path = urlObj.searchParams.get("q");
   if (path) {
-    return Response.redirect("https://" + urlObj.host + PREFIX + path, 301);
+    return Response.redirect(
+      "https://" + urlObj.host + GHPROXY_PATH + path,
+      301
+    );
   }
   // cfworker 会把路径中的 `//` 合并成 `/`
   path = urlObj.href
-    .slice(urlObj.origin.length + PREFIX.length)
+    .slice(urlObj.origin.length + GHPROXY_PATH.length)
     .replace(/^https?:\/+/, "https://");
 
   log("request url:", request.url);
@@ -174,7 +178,8 @@ async function proxy(urlObj: URL, reqInit: RequestInit) {
   if (resHdrNew.has("location")) {
     const _location = resHdrNew.get("location");
     if (_location) {
-      if (checkUrl(_location)) resHdrNew.set("location", PREFIX + _location);
+      if (checkUrl(_location))
+        resHdrNew.set("location", GHPROXY_PATH + _location);
       else {
         const u = newUrl(_location);
         if (u) {

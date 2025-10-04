@@ -8,7 +8,7 @@ const Header = () => {
 
           <div
             className="cursor-pointer hover:opacity-80 transition-opacity duration-200"
-            onClick={(e) =>
+            onClick={() =>
               window.open("https://github.com/NtskwK/ghproxy-plus")
             }
           >
