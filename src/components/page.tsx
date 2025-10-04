@@ -1,45 +1,49 @@
 "use client";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { CheckCircle2Icon } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { extractRepoFromURL } from "@/lib/utils";
+import { getRepoTags } from "@/lib/ghApi";
+import { CheckFormSchema, GetAssetsFormSchema } from "./lib";
+import Combobox from "./combobox";
 
 interface ApiResponse {
   message: string;
 }
 
-const formSchema = z.object({
-  repoUrl: z
-    .url("Invalid URL!")
-    .refine(
-      (url) => url.includes("github.com"),
-      "Please enter a GitHub repo URL!"
-    ),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+type CheckFormValues = z.infer<typeof CheckFormSchema>;
+type GetAssetsFormValues = z.infer<typeof GetAssetsFormSchema>;
 
 export default function HelloPage() {
   const [message, setMessage] = useState("Loading...");
   const [submitResult, setSubmitResult] = useState<string>("");
+  const [tagList, setTagList] = useState([{ label: "None", value: "None" }]);
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const checkForm = useForm<CheckFormValues>({
+    resolver: zodResolver(CheckFormSchema),
     defaultValues: {
       repoUrl: "",
+    },
+  });
+
+  const getAssetsForm = useForm<GetAssetsFormValues>({
+    resolver: zodResolver(GetAssetsFormSchema),
+    defaultValues: {
+      user: "",
+      repo: "",
+      tag: "",
     },
   });
 
@@ -52,16 +56,40 @@ export default function HelloPage() {
     fetchData();
   }, []);
 
-  const onSubmit = async (values: FormValues) => {
+  const onSubmitCheck = async (values: CheckFormValues) => {
     setSubmitResult(`Checking repo: ${values.repoUrl}`);
-
-    try {
-      // 模拟API调用
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      setSubmitResult(`✅ Successful inspection: ${values.repoUrl}`);
-    } catch (error) {
-      setSubmitResult(`❌ Inspection failed: ${error}`);
+    const repo = extractRepoFromURL(values.repoUrl);
+    if (!repo) {
+      setSubmitResult("❌ Invalid GitHub repo URL.");
+      return;
     }
+
+    getRepoTags(repo.owner, repo.repo)
+      .then((tags) => {
+        if (tags.length === 0) {
+          setSubmitResult("❌ No tags found in the repo.");
+          return;
+        }
+        const tagNames = tags.map((tag) => ({
+          label: tag.name,
+          value: tag.name,
+        }));
+        tagNames[0].label += " (latest)";
+        setTagList(tagNames.slice(0, 5)); // Show only first 5 tags
+
+        console.log("Fetched tags:", tags);
+      })
+      .catch((error) => {
+        setSubmitResult(`❌ Error fetching tags: ${error}`);
+      });
+  };
+
+  const onSubmitDownload = async () => {
+    console.log("Downloading...");
+  };
+
+  const setTag = (value: string) => {
+    getAssetsForm.setValue("tag", value);
   };
 
   return (
@@ -69,10 +97,13 @@ export default function HelloPage() {
       {/* Main Content */}
       <main className="flex-1 container mx-auto p-6 flex flex-col items-center justify-center gap-6">
         <div className="w-full max-w-xl space-y-4">
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <Form {...checkForm}>
+            <form
+              onSubmit={checkForm.handleSubmit(onSubmitCheck)}
+              className="space-y-4"
+            >
               <FormField
-                control={form.control}
+                control={checkForm.control}
                 name="repoUrl"
                 render={({ field }) => (
                   <FormItem>
@@ -86,9 +117,11 @@ export default function HelloPage() {
                       </FormControl>
                       <Button
                         type="submit"
-                        disabled={form.formState.isSubmitting}
+                        disabled={checkForm.formState.isSubmitting}
                       >
-                        {form.formState.isSubmitting ? "Checking..." : "Check"}
+                        {checkForm.formState.isSubmitting
+                          ? "Checking..."
+                          : "Check"}
                       </Button>
                     </div>
                     <FormMessage />
@@ -97,26 +130,27 @@ export default function HelloPage() {
               />
             </form>
           </Form>
-
-          <div className="text-center space-y-2">
-            <p className="text-muted-foreground">API消息: {message}</p>
-            {submitResult && (
-              <p className="text-sm font-medium">{submitResult}</p>
-            )}
-          </div>
         </div>
 
-        {/* Demo Alert */}
-        <div className="w-full max-w-xl">
-          <Alert>
-            <CheckCircle2Icon className="h-4 w-4" />
-            <AlertTitle>成功！你的更改已保存</AlertTitle>
-            <AlertDescription>
-              这是一个带有图标、标题和描述的提示框。现在使用了React Hook
-              Form进行表单验证。
-            </AlertDescription>
-          </Alert>
-        </div>
+        <Form {...getAssetsForm}>
+          <form
+            onSubmit={getAssetsForm.handleSubmit(onSubmitDownload)}
+            className="space-y-6 flex flex-col items-center justify-center"
+          >
+            <FormField
+              control={getAssetsForm.control}
+              name="tag"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel>Tag</FormLabel>
+                  <Combobox field={field} options={tagList} setter={setTag} />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit">Search</Button>
+          </form>
+        </Form>
       </main>
     </>
   );
