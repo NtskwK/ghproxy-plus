@@ -101,7 +101,7 @@ const getKeywords = (
   return keywords;
 };
 
-const getDownloadAsset = (
+export const getDownloadAsset = (
   assets: GhReleaseAssets[],
   ua: string | undefined,
   keyword: string | undefined
