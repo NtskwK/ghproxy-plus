@@ -88,6 +88,25 @@ export default function HelloPage() {
       return;
     }
 
+    const repoKey = `${repo.owner}/${repo.repo}`;
+
+    const cached = sessionStorage.getItem(repoKey);
+    if (cached) {
+      const releases = JSON.parse(cached) as GhRelease[];
+      const tagNames = releases.map((release) => ({
+        label: release.name,
+        releaseId: release.id.toString(),
+      }));
+      tagNames[0].label += " (latest)";
+      setTagList(tagNames.slice(0, 5)); // Show only first 5 tags
+      setTag(tagNames[0].releaseId);
+      setReleases(releases);
+
+      updateSearchParams("repo", values.repoUrl);
+      setSubmitResult("");
+      return;
+    }
+
     getRepoReleases(repo.owner, repo.repo)
       .then((releases) => {
         if (releases.length === 0) {
@@ -107,6 +126,8 @@ export default function HelloPage() {
 
         updateSearchParams("repo", values.repoUrl);
         setSubmitResult("");
+
+        sessionStorage.setItem(repoKey, JSON.stringify(releases));
       })
       .catch((error) => {
         setSubmitResult(`❌ Error fetching tags: ${error}`);
@@ -128,10 +149,8 @@ export default function HelloPage() {
 
     const baseUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
     const url = baseUrl + "/api/ghproxy/" + asset;
-    // 通过创建 a 标签实现下载
     const link = document.createElement("a");
     link.href = url;
-    link.download = ""; // 可选：可设置文件名
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
