@@ -1,4 +1,4 @@
-import { GhRelease, GhReleaseAssets, GhTag } from "./ghResponse";
+import { GhRelease, GhTag } from "./ghResponse";
 import { LRUCache } from "next/dist/server/lib/lru-cache";
 import { isServer } from "./utils";
 

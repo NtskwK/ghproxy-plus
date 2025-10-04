@@ -63,9 +63,8 @@ export default function HelloPage() {
     const url = searchParams.get("repo");
     if (url) {
       checkForm.setValue("repoUrl", url);
-      checkForm.handleSubmit(onSubmitGetReleases)();
     }
-  }, [searchParams]);
+  }, [searchParams, checkForm]);
 
   useEffect(() => {
     if (tag === "None" || tag === "") {
@@ -105,7 +104,7 @@ export default function HelloPage() {
         }
       }
     }
-  }, [keyword, ua]);
+  }, [keyword, ua, tag, releases]);
 
   const onSubmitGetReleases = async (values: CheckFormValues) => {
     const repo = extractRepoFromURL(values.repoUrl);

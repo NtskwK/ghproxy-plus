@@ -3,7 +3,7 @@ import { getDownloadAsset } from "@/lib/searchPkg";
 import { extractRepoFromURL } from "@/lib/utils";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
-import { GHPROXY_PATH } from "../../ghproxy/[...url]/route";
+import { GHPROXY_PATH } from "@/lib/utils";
 
 const PREFIX = "/api/download/";
 

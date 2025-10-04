@@ -1,7 +1,10 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { IOS, UAParser } from "ua-parser-js";
+import { UAParser } from "ua-parser-js";
 import { CPUArch } from "ua-parser-js/enums";
+
+
+export const GHPROXY_PATH = "/api/ghproxy/";
 
 export const isClient = typeof window !== "undefined";
 export const isServer = !isClient;

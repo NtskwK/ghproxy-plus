@@ -1,4 +1,3 @@
-import { IOS, UAParser } from "ua-parser-js";
 import { GhReleaseAssets } from "./ghResponse";
 import { CPUArchitecture, getOSandArch } from "./utils";
 
