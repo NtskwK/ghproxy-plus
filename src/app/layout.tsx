@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "../components/header";
 import Footer from "../components/footer";
-import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Hono | nextjs",
@@ -19,7 +18,6 @@ export default function RootLayout({
       <head>
         <title>ghproxy plus</title>
       </head>
-      <Toaster position="top-center" />
       <body className="font-sans antialiased">
         <div className="min-h-screen flex flex-col bg-background">
           <Header />

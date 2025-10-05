@@ -13,6 +13,7 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 Proxies GitHub resources with CORS headers, allowing accelerated access to GitHub files, releases, and repositories.
 
 **Supported URL Types:**
+
 - GitHub releases and archives: `github.com/{owner}/{repo}/releases/*`
 - GitHub raw files: `github.com/{owner}/{repo}/blob/*` or `github.com/{owner}/{repo}/raw/*`
 - GitHub raw content: `raw.githubusercontent.com/*` or `raw.github.com/*`
@@ -27,6 +28,7 @@ curl https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/
 ```
 
 **Response:**
+
 - Success: Proxied content with CORS headers
 - Error 400: Invalid or unsupported URL
 - Error 403: URL blocked by whitelist (if configured)
@@ -41,21 +43,24 @@ curl https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/
 Automatically detects the user's operating system and architecture from the User-Agent header and downloads the most appropriate release asset from the latest release.
 
 **Parameters:**
+
 - `keyword` (optional): Additional keyword to filter assets
 
 **Example:**
 
-```bash
-curl -L https://your-domain.com/api/download/https://github.com/owner/repo
-```
+~~curl -L [https://your-domain.com/api/download/https://github.com/owner/repo]~~
+
+Don't fetch it! You can only access it through the browser.
 
 **Detection Logic:**
+
 - Parses User-Agent to determine OS (Windows, macOS, Linux, Android, iOS, etc.)
 - Detects CPU architecture (x86_64, arm64, etc.)
 - Automatically selects the best matching asset from the latest release
 - Falls back to first asset if no match found
 
 **Response:**
+
 - Success (302): Redirects to the download URL via `/api/ghproxy/`
 - Error (302): Redirects to 404 page if repo not found or no suitable asset
 

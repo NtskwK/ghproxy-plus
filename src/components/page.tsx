@@ -23,12 +23,32 @@ import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { getDownloadAsset } from "@/lib/searchPkg";
 import { toast } from "sonner";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./ui/drawer";
+import MarkdownRenderer from "./markdownRenderer";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
 export default function HelloPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const [apiDocumentation, setApiDocumentation] = useState("");
+
+  useEffect(() => {
+    fetch("/api.md")
+      .then((res) => res.text())
+      .then(setApiDocumentation)
+      .catch(() => setApiDocumentation("文档加载失败"));
+  }, []);
+
   const [submitResult, setSubmitResult] = useState<string>("");
   const [tag, setTag] = useState("");
   const [tagList, setTagList] = useState([
@@ -206,74 +226,80 @@ export default function HelloPage() {
 
   return (
     <>
-      {/* Main Content */}
-      <main className="flex-1 container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6 flex flex-col items-center justify-center gap-6 space-y-4">
-        <div className="w-[80%] sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl space-y-10">
-          {submitResult && (
-            <Alert variant="destructive">
-              <CheckCircle2Icon />
-              <AlertTitle>Fail to fetch releases</AlertTitle>
-              <AlertDescription>{submitResult}</AlertDescription>
-            </Alert>
-          )}
+      <div className="w-[80%] sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl space-y-10">
+        {submitResult && (
+          <Alert variant="destructive">
+            <CheckCircle2Icon />
+            <AlertTitle>Fail to fetch releases</AlertTitle>
+            <AlertDescription>{submitResult}</AlertDescription>
+          </Alert>
+        )}
 
-          <Form {...checkForm}>
-            <form
-              onSubmit={checkForm.handleSubmit(onSubmitGetReleases)}
-              className="space-y-4"
-            >
-              <FormField
-                control={checkForm.control}
-                name="repoUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GitHub repo URL</FormLabel>
-                    <div className="flex gap-2">
-                      <FormControl className="flex-1">
-                        <Input
-                          placeholder="https://github.com/username/repo"
-                          {...field}
-                        />
-                      </FormControl>
-                      <Button
-                        type="submit"
-                        disabled={checkForm.formState.isSubmitting}
-                      >
-                        {checkForm.formState.isSubmitting
-                          ? "Checking..."
-                          : "Check"}
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
+        <Form {...checkForm}>
+          <form
+            onSubmit={checkForm.handleSubmit(onSubmitGetReleases)}
+            className="space-y-4"
+          >
+            <FormField
+              control={checkForm.control}
+              name="repoUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>GitHub repo URL</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl className="flex-1">
+                      <Input
+                        placeholder="https://github.com/username/repo"
+                        {...field}
+                      />
+                    </FormControl>
+                    <Button
+                      type="submit"
+                      disabled={checkForm.formState.isSubmitting}
+                    >
+                      {checkForm.formState.isSubmitting
+                        ? "Checking..."
+                        : "Check"}
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
 
-          <div className="flex flex-col gap-2 space-y-8">
-            <Combobox
-              getter={{ value: tag }}
-              options={tagList.map((tag) => ({
-                label: tag.label,
-                value: tag.releaseId,
-              }))}
-              setter={setTag}
-              defaultValue="Select tag"
-            />
-            <Combobox
-              getter={{ value: asset }}
-              options={assetList}
-              setter={setAsset}
-              defaultValue="Select download asset"
-            />
-            <Button onClick={handleDownload}>Download</Button>
-            <Button onClick={handleCopyDownloadUrl}>
-              Generate Download URL
-            </Button>
-          </div>
+        <div className="flex flex-col gap-2 space-y-8">
+          <Combobox
+            getter={{ value: tag }}
+            options={tagList.map((tag) => ({
+              label: tag.label,
+              value: tag.releaseId,
+            }))}
+            setter={setTag}
+            defaultValue="Select tag"
+          />
+          <Combobox
+            getter={{ value: asset }}
+            options={assetList}
+            setter={setAsset}
+            defaultValue="Select download asset"
+          />
+          <Button onClick={handleDownload}>Download</Button>
+          <Button onClick={handleCopyDownloadUrl}>Generate Download URL</Button>
+
+          <Drawer>
+            <DrawerTrigger>API Documentation</DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>API of ghproxy-plus</DrawerTitle>
+                <MarkdownRenderer content={apiDocumentation} />
+              </DrawerHeader>
+              <DrawerFooter></DrawerFooter>
+            </DrawerContent>
+          </Drawer>
         </div>
-      </main>
+      </div>
     </>
   );
 }
