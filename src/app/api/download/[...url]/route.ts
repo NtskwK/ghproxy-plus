@@ -23,12 +23,20 @@ export async function GET(request: Request) {
     .slice(urlObj.origin.length + PREFIX.length)
     .replace(/^https?:\/+/, "https://");
   if (!path || path.trim() === "") {
-    return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
+    const message = "Invalid URL.";
+    return NextResponse.redirect(
+      new URL("/api/404?message=" + encodeURIComponent(message), urlObj.origin),
+      302
+    );
   }
 
   const repo = extractRepoFromURL(path);
   if (!repo) {
-    return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
+    const message = "Repo not found.";
+    return NextResponse.redirect(
+      new URL("/api/404?message=" + encodeURIComponent(message), urlObj.origin),
+      302
+    );
   }
 
   const reqInit = {
@@ -59,12 +67,20 @@ export async function GET(request: Request) {
   }
 
   if (!releases || releases.length === 0) {
-    return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
+    const message = "No releases found.";
+    return NextResponse.redirect(
+      new URL("/api/404?message=" + encodeURIComponent(message), urlObj.origin),
+      302
+    );
   }
 
   const asset = getDownloadAsset(releases[0].assets, ua, keyword);
   if (!asset) {
-    return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
+    const message = "No asset found in release.";
+    return NextResponse.redirect(
+      new URL("/api/404?message=" + encodeURIComponent(message), urlObj.origin),
+      302
+    );
   }
 
   const downloadUrl = urlObj.origin + GHPROXY_PATH + asset.browser_download_url;
