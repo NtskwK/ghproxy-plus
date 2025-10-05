@@ -22,6 +22,7 @@ import { CheckCircle2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { getDownloadAsset } from "@/lib/searchPkg";
+import { toast } from "sonner";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
@@ -194,7 +195,13 @@ export default function HelloPage() {
     const url = generateDownloadUrl();
     if (!url) return;
     await navigator.clipboard.writeText(url);
-    alert("Download URL copied to clipboard!");
+    toast(url, {
+      description: "URL has been copied to clipboard!",
+      action: {
+        label: "I got it",
+        onClick: () => console.log("Click I got it!"),
+      },
+    });
   };
 
   return (
