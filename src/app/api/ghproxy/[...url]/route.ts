@@ -86,10 +86,7 @@ export async function GET(request: Request) {
     .replace(/^https?:\/+/, "https://");
 
   log("request url:", request.url);
-  log("urlObj.href:", urlObj.href);
   log("urlObj.origin:", urlObj.origin);
-  log("urlObj.hostname:", urlObj.hostname);
-  log("urlObj.pathname:", urlObj.pathname);
   log("new url:", path);
   if (
     path.search(exp1) === 0 ||
@@ -168,7 +165,9 @@ async function proxy(urlObj: URL, reqInit: RequestInit) {
   try {
     res = await fetch(urlObj.href, reqInit);
   } catch (err) {
-    return new Response("fetch error: " + err + ", url: " + urlObj.href, { status: 500 });
+    return new Response("fetch error: " + err + ", url: " + urlObj.href, {
+      status: 500,
+    });
   }
   const resHdrOld = res.headers;
   const resHdrNew = new Headers(resHdrOld);
