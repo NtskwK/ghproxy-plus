@@ -30,7 +30,20 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
   }
 
-  const releases = await getRepoReleases(repo.owner, repo.repo);
+  let releases;
+  try {
+    releases = await getRepoReleases(repo.owner, repo.repo);
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "fetch error: " + err,
+        status: 500,
+        requestUrl: request.url,
+      },
+      { status: 500 }
+    );
+  }
+
   if (!releases || releases.length === 0) {
     return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
   }
