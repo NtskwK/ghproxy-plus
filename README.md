@@ -1,4 +1,130 @@
+# GHProxy Plus
+
+A GitHub proxy service that accelerates access to GitHub resources and provides smart download functionality for release assets.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## API Manual
+
+### 1. GitHub Proxy API
+
+**Endpoint:** `/api/ghproxy/{github-url}`
+
+Proxies GitHub resources with CORS headers, allowing accelerated access to GitHub files, releases, and repositories.
+
+**Supported URL Types:**
+- GitHub releases and archives: `github.com/{owner}/{repo}/releases/*`
+- GitHub raw files: `github.com/{owner}/{repo}/blob/*` or `github.com/{owner}/{repo}/raw/*`
+- GitHub raw content: `raw.githubusercontent.com/*` or `raw.github.com/*`
+- GitHub gists: `gist.githubusercontent.com/*` or `gist.github.com/*`
+- GitHub repository info: `github.com/{owner}/{repo}/info/*` or `github.com/{owner}/{repo}/git-*`
+- GitHub tags: `github.com/{owner}/{repo}/tags/*`
+
+**Usage:**
+
+```bash
+# Using path parameter
+https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/download/v1.0.0/file.zip
+
+# Using query parameter
+https://your-domain.com/api/ghproxy/?q=https://github.com/owner/repo/releases/download/v1.0.0/file.zip
+```
+
+**Examples:**
+
+```bash
+# Download a release asset
+curl https://your-domain.com/api/ghproxy/https://github.com/microsoft/vscode/releases/download/1.85.0/VSCode-linux-x64.tar.gz
+
+# Access raw file content
+curl https://your-domain.com/api/ghproxy/https://raw.githubusercontent.com/owner/repo/main/README.md
+
+# Clone repository via proxy
+git clone https://your-domain.com/api/ghproxy/https://github.com/owner/repo.git
+```
+
+**Response:**
+- Success: Proxied content with CORS headers
+- Error 400: Invalid or unsupported URL
+- Error 403: URL blocked by whitelist (if configured)
+- Error 500: Fetch error
+
+---
+
+### 2. Smart Download API
+
+**Endpoint:** `/api/download/{github-repo-url}`
+
+Automatically detects the user's operating system and architecture from the User-Agent header and downloads the most appropriate release asset from the latest release.
+
+**Parameters:**
+- `keyword` (optional): Additional keyword to filter assets
+
+**Usage:**
+
+```bash
+# Using path parameter
+https://your-domain.com/api/download/https://github.com/owner/repo
+
+# Using query parameter
+https://your-domain.com/api/download/?q=https://github.com/owner/repo
+
+# With keyword filter
+https://your-domain.com/api/download/https://github.com/owner/repo?keyword=amd64
+```
+
+**Examples:**
+
+```bash
+# Download latest release for current platform
+curl -L https://your-domain.com/api/download/https://github.com/cli/cli
+
+# Download with specific keyword
+curl -L "https://your-domain.com/api/download/https://github.com/cli/cli?keyword=linux"
+```
+
+**Detection Logic:**
+- Parses User-Agent to determine OS (Windows, macOS, Linux, Android, iOS, etc.)
+- Detects CPU architecture (x86_64, arm64, etc.)
+- Automatically selects the best matching asset from the latest release
+- Falls back to first asset if no match found
+
+**Response:**
+- Success (302): Redirects to the download URL via `/api/ghproxy/`
+- Error (302): Redirects to 404 page if repo not found or no suitable asset
+
+---
+
+### 3. Health Check API
+
+**Endpoint:** `/api/ping`
+
+Health check endpoint that returns server status information.
+
+**Usage:**
+
+```bash
+GET https://your-domain.com/api/ping
+```
+
+**Response:**
+
+```json
+{
+  "message": "pong",
+  "uptime": 12345.67,
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "pid": 1234
+}
+```
+
+**Response Fields:**
+- `message`: Always returns "pong"
+- `uptime`: Server uptime in seconds (null in edge environments)
+- `timestamp`: Current server time in ISO 8601 format
+- `pid`: Process ID (null in edge environments)
+
+---
 
 ## Getting Started
 
