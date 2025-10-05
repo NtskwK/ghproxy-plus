@@ -7,24 +7,30 @@ interface ReleasesCache {
   timestamp: number;
 }
 
+interface GhApiError extends Error {
+  status: number;
+  response: Response;
+  data: Record<string, unknown>;
+}
+
 const cache = new LRUCache(10);
 
 const getRepoTags = async (owner: string, repo: string): Promise<GhTag[]> => {
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/tags`
-    );
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/tags`
+  );
 
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
-    }
-
-    const data = (await response.json()) as GhTag[];
-    return data;
-  } catch (error) {
-    console.error("Error fetching tags data:", error);
+  if (!response.ok) {
+    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    const error = new Error(`Network response was not ok: ${response.status}`) as GhApiError;
+    error.status = response.status;
+    error.response = response;
+    error.data = errorData;
     throw error;
   }
+
+  const data = (await response.json()) as GhTag[];
+  return data;
 };
 
 const getRepoReleases = async (
@@ -41,27 +47,27 @@ const getRepoReleases = async (
     }
   }
 
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/releases`
-    );
+  const response = await fetch(
+    `https://api.github.com/repos/${owner}/${repo}/releases`
+  );
 
-    if (!response.ok) {
-      throw new Error(`Network response was not ok: ${response.status}`);
-    }
-
-    const data = (await response.json()) as GhRelease[];
-    if (isServer) {
-      cache.set(`${owner}/${repo}`, {
-        releases: data,
-        timestamp: Date.now(),
-      });
-    }
-    return data;
-  } catch (error) {
-    console.error("Error fetching releases data:", error);
+  if (!response.ok) {
+    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    const error = new Error(`Network response was not ok: ${response.status}`) as GhApiError;
+    error.status = response.status;
+    error.response = response;
+    error.data = errorData;
     throw error;
   }
+
+  const data = (await response.json()) as GhRelease[];
+  if (isServer) {
+    cache.set(`${owner}/${repo}`, {
+      releases: data,
+      timestamp: Date.now(),
+    });
+  }
+  return data;
 };
 
 const getLatestRelease = async (
