@@ -34,13 +34,15 @@ export async function GET(request: Request) {
   try {
     releases = await getRepoReleases(repo.owner, repo.repo);
   } catch (err) {
+    const error = err as { status?: number; data?: Record<string, unknown>; message?: string };
+    const statusCode = error.status || 500;
+    const errorData = error.data || { message: error.message };
     return NextResponse.json(
       {
-        error: "fetch error: " + err,
-        status: 500,
-        requestUrl: request.url,
+        ...errorData,
+        requestUrl: `https://api.github.com/repos/${repo.owner}/${repo.repo}/releases`,
       },
-      { status: 500 }
+      { status: statusCode }
     );
   }
 
