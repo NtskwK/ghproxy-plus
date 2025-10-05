@@ -168,7 +168,7 @@ async function proxy(urlObj: URL, reqInit: RequestInit) {
   try {
     res = await fetch(urlObj.href, reqInit);
   } catch (err) {
-    return new Response("fetch error: " + err, { status: 500 });
+    return new Response("fetch error: " + err + ", url: " + urlObj.href, { status: 500 });
   }
   const resHdrOld = res.headers;
   const resHdrNew = new Headers(resHdrOld);

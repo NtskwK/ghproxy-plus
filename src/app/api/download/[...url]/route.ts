@@ -38,7 +38,7 @@ export async function GET(request: Request) {
       {
         error: "fetch error: " + err,
         status: 500,
-        requestUrl: request.url,
+        requestUrl: `https://api.github.com/repos/${repo.owner}/${repo.repo}/releases`,
       },
       { status: 500 }
     );
