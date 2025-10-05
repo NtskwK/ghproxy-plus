@@ -3,7 +3,6 @@ import { twMerge } from "tailwind-merge";
 import { UAParser } from "ua-parser-js";
 import { CPUArch } from "ua-parser-js/enums";
 
-
 export const GHPROXY_PATH = "/api/ghproxy/";
 
 export const isClient = typeof window !== "undefined";
@@ -13,6 +12,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export interface ErrorWithUrl extends Error {
+  url?: string;
+}
+
 interface GhRepo {
   owner: string;
   repo: string;
@@ -20,13 +23,17 @@ interface GhRepo {
 
 export function extractRepoFromURL(url: string): GhRepo | null {
   // anti injection
-  if (!url.startsWith("https://github.com")
-    && !url.startsWith("http://github.com")
-    && !url.startsWith("github.com")) {
-      return null;
-    }
+  if (
+    !url.startsWith("https://github.com") &&
+    !url.startsWith("http://github.com") &&
+    !url.startsWith("github.com")
+  ) {
+    return null;
+  }
 
-  const match = url.match(/^(?:https?:\/\/)?github\.com\/([^\/]+)\/([^\/?#]+)$/);
+  const match = url.match(
+    /^(?:https?:\/\/)?github\.com\/([^\/]+)\/([^\/?#]+)$/
+  );
   if (match) {
     return {
       owner: match[1],

@@ -1,6 +1,6 @@
 import { getRepoReleases } from "@/lib/ghApi";
 import { getDownloadAsset } from "@/lib/searchPkg";
-import { extractRepoFromURL } from "@/lib/utils";
+import { extractRepoFromURL, getOSandArch } from "@/lib/utils";
 import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { GHPROXY_PATH } from "@/lib/utils";
@@ -8,7 +8,8 @@ import { GHPROXY_PATH } from "@/lib/utils";
 const PREFIX = "/api/download/";
 
 export async function GET(request: Request) {
-  const ua = (await headers()).get("user-agent") || "";
+  const headersObj = await headers();
+  const ua = headersObj.get("user-agent") || "";
   const urlObj = new URL(request.url);
   const keyword = urlObj.searchParams.get("keyword") || "";
 
@@ -30,16 +31,30 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/api/404", urlObj.origin), 302);
   }
 
+  const reqInit = {
+    method: request.method,
+    headers: new Headers(request.headers),
+    redirect: "manual",
+    body: request.body,
+  } as RequestInit;
+
   let releases;
   try {
-    releases = await getRepoReleases(repo.owner, repo.repo);
+    releases = await getRepoReleases(repo.owner, repo.repo, reqInit);
   } catch (err) {
+    const { os, arch } = getOSandArch(ua);
+
+    const { url, status } = err as { url?: string; status?: number };
+
     return NextResponse.json(
       {
+        os,
+        arch,
+        headersObj,
         error: err,
-        requestUrl: `https://api.github.com/repos/${repo.owner}/${repo.repo}/releases`,
+        requestUrl: url || null,
       },
-      { status: 500 }
+      { status: status || 500 }
     );
   }
 
