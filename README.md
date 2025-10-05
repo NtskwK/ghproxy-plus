@@ -20,27 +20,10 @@ Proxies GitHub resources with CORS headers, allowing accelerated access to GitHu
 - GitHub repository info: `github.com/{owner}/{repo}/info/*` or `github.com/{owner}/{repo}/git-*`
 - GitHub tags: `github.com/{owner}/{repo}/tags/*`
 
-**Usage:**
+**Example:**
 
 ```bash
-# Using path parameter
-https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/download/v1.0.0/file.zip
-
-# Using query parameter
-https://your-domain.com/api/ghproxy/?q=https://github.com/owner/repo/releases/download/v1.0.0/file.zip
-```
-
-**Examples:**
-
-```bash
-# Download a release asset
-curl https://your-domain.com/api/ghproxy/https://github.com/microsoft/vscode/releases/download/1.85.0/VSCode-linux-x64.tar.gz
-
-# Access raw file content
-curl https://your-domain.com/api/ghproxy/https://raw.githubusercontent.com/owner/repo/main/README.md
-
-# Clone repository via proxy
-git clone https://your-domain.com/api/ghproxy/https://github.com/owner/repo.git
+curl https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/download/v1.0.0/file.zip
 ```
 
 **Response:**
@@ -60,27 +43,10 @@ Automatically detects the user's operating system and architecture from the User
 **Parameters:**
 - `keyword` (optional): Additional keyword to filter assets
 
-**Usage:**
+**Example:**
 
 ```bash
-# Using path parameter
-https://your-domain.com/api/download/https://github.com/owner/repo
-
-# Using query parameter
-https://your-domain.com/api/download/?q=https://github.com/owner/repo
-
-# With keyword filter
-https://your-domain.com/api/download/https://github.com/owner/repo?keyword=amd64
-```
-
-**Examples:**
-
-```bash
-# Download latest release for current platform
-curl -L https://your-domain.com/api/download/https://github.com/cli/cli
-
-# Download with specific keyword
-curl -L "https://your-domain.com/api/download/https://github.com/cli/cli?keyword=linux"
+curl -L https://your-domain.com/api/download/https://github.com/owner/repo
 ```
 
 **Detection Logic:**
@@ -101,10 +67,10 @@ curl -L "https://your-domain.com/api/download/https://github.com/cli/cli?keyword
 
 Health check endpoint that returns server status information.
 
-**Usage:**
+**Example:**
 
 ```bash
-GET https://your-domain.com/api/ping
+curl https://your-domain.com/api/ping
 ```
 
 **Response:**
@@ -117,12 +83,6 @@ GET https://your-domain.com/api/ping
   "pid": 1234
 }
 ```
-
-**Response Fields:**
-- `message`: Always returns "pong"
-- `uptime`: Server uptime in seconds (null in edge environments)
-- `timestamp`: Current server time in ISO 8601 format
-- `pid`: Process ID (null in edge environments)
 
 ---
 
