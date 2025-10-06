@@ -4,6 +4,64 @@ A GitHub release asset download service inspired by gh-proxy
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Deploy
+
+### Cloudflare Workers (Recommended)
+
+[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/NtskwK/ghproxy-plus.git)
+
+### Node.js
+
+Clone the Repository
+
+```bash
+git clone https://github.com/your-username/ghproxy-plus.git
+cd ghproxy-plus
+```
+
+Install Dependencies
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
+
+Build the Project
+
+```bash
+npm build
+# or
+yarn build
+# or
+pnpm build
+# or
+bun build
+```
+
+Start the Server
+
+```bash
+npm start
+# or
+yarn start
+# or
+pnpm start
+# or
+bun start
+```
+
+### Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
 ## API Manual
 
 ### 1. GitHub Proxy API
@@ -108,63 +166,6 @@ bun dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `src/app/page.tsx`. The page auto-updates as you edit the file.
-
-## Deploy
-
-### Cloudflare Workers ( Recommended)
-
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/NtskwK/ghproxy-plus.git)
-
-### Node.js
-
-Clone the Repository
-
-```bash
-git clone https://github.com/your-username/ghproxy-plus.git
-cd ghproxy-plus
-```
-
-Install Dependencies
-
-```bash
-npm install
-# or
-yarn install
-# or
-pnpm install
-# or
-bun install
-```
-
-Build the Project
-
-```bash
-npm build
-# or
-yarn build
-# or
-pnpm build
-# or
-bun build
-```
-
-Start the Server
-
-```bash
-npm start
-# or
-yarn start
-# or
-pnpm start
-# or
-bun start
-```
-
-### Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
 ## Learn More
 
