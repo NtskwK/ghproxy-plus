@@ -5,33 +5,40 @@ const searchAsset = (
   keywords: string[],
   assets: GhReleaseAssets[]
 ): GhReleaseAssets | undefined => {
-  if (!keywords || keywords.length === 0) {
+  if (!keywords?.length || !assets?.length) {
     return undefined;
   }
 
-  const results = assets.filter((asset) =>
-    asset.name.toLowerCase().includes(keywords[0].toLowerCase())
-  );
+  const lowerKeywords = keywords.map((k) => k.toLowerCase());
 
-  if (results.length === 1) {
-    return results[0];
+  // select assets that match all keywords
+  const fullMatches = assets.filter((asset) => {
+    const lowerName = asset.name.toLowerCase();
+    return lowerKeywords.every((keyword) => lowerName.includes(keyword));
+  });
+
+  if (fullMatches.length > 0) {
+    return fullMatches[0];
   }
 
-  if (results.length > 1) {
-    if (keywords.length > 1) {
-      return searchAsset(keywords.slice(1), results);
-    } else {
-      return results[0];
+  // If no full matches, find the asset with the most keyword matches
+  let bestMatch: GhReleaseAssets | undefined;
+  let maxMatches = 0;
+
+  assets.forEach((asset) => {
+    const lowerName = asset.name.toLowerCase();
+    const matchCount = lowerKeywords.filter((keyword) =>
+      lowerName.includes(keyword)
+    ).length;
+
+    // Prefer assets that match more keywords
+    // Choose at least one asset if there are no full matches
+    if (matchCount >= maxMatches) {
+      maxMatches = matchCount;
+      bestMatch = asset;
     }
-  }
-
-  if (results.length < 1) {
-    if (keywords.length > 1) {
-      return searchAsset(keywords.slice(1), assets);
-    } else {
-      return undefined;
-    }
-  }
+  });
+  return bestMatch;
 };
 
 /**
@@ -49,6 +56,7 @@ const getKeywords = (
   arch: CPUArchitecture
 ): string[] => {
   const keywords: string[] = [];
+  // Add architecture keywords
   if (arch) {
     keywords.push(arch.toLowerCase());
     if (arch.toLowerCase() === "amd64") {
@@ -62,41 +70,47 @@ const getKeywords = (
     }
   }
 
+  // Add OS keywords
   if (osName) {
     if (osName.toLowerCase() === "android") {
       keywords.push("android", "armv8", "apk");
-    } else if (osName.toLowerCase() === "arch") {
-      keywords.push("archlinux", "unknown");
-    } else if (osName.toLowerCase() === "freebsd") {
-      keywords.push("freebsd");
-    } else if (osName.toLowerCase() === "gnu") {
-      keywords.push("gnu", "linux", "unknown");
-    } else if (osName.toLowerCase() === "harmonyos") {
-      keywords.push("hap");
+    } else if (osName.toLowerCase() === "windows") {
+      keywords.push("windows", "win32", "win64", "win", "exe", "msi", "zip");
     } else if (osName.toLowerCase() === "ios") {
       keywords.push("ios", "ipa");
     } else if (osName.toLowerCase() === "macos") {
       keywords.push("macos", "darwin", "dmg", "aarch64");
-    } else if (
-      osName.toLowerCase() === "debian" ||
-      osName.toLowerCase() === "ubuntu" ||
-      osName.toLowerCase() === "mint" ||
-      osName.toLowerCase() === "deepin"
-    ) {
-      keywords.push("debian", "unknown", "deb", "ubuntu", "mint");
-    } else if (
-      osName.toLowerCase() === "centos" ||
-      osName.toLowerCase() === "redhat"
-    ) {
-      keywords.push("centos", "el", "rhel", "rpm");
-    } else if (osName.toLowerCase() === "linux") {
-      keywords.push("unknown", "linux");
-    } else if (osName.toLowerCase() === "windows") {
-      keywords.push("windows", "win32", "win64", "win", "exe", "msi", "zip");
+    } else {
+      // Linux and others
+      if (
+        osName.toLowerCase() === "debian" ||
+        osName.toLowerCase() === "ubuntu" ||
+        osName.toLowerCase() === "mint" ||
+        osName.toLowerCase() === "deepin"
+      ) {
+        keywords.push("debian", "unknown", "deb", "ubuntu", "mint");
+      } else if (
+        osName.toLowerCase() === "centos" ||
+        osName.toLowerCase() === "redhat"
+      ) {
+        keywords.push("centos", "el", "rhel", "rpm");
+      } else if (osName.toLowerCase() === "arch") {
+        keywords.push("archlinux", "unknown");
+      } else if (osName.toLowerCase() === "linux") {
+        keywords.push("unknown", "linux");
+      } else if (osName.toLowerCase() === "freebsd") {
+        keywords.push("freebsd");
+      } else if (osName.toLowerCase() === "harmonyos") {
+        keywords.push("hap");
+      }
+      // Any else?
+
+      // others
+      keywords.push("gnu", "linux", "unknown", "flatpak", "appimage", "pkg");
     }
   }
 
-  keywords.push("tar.gz", "zip");
+  keywords.push("tar", "zip", "gz", "zst");
   return keywords;
 };
 

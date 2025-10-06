@@ -12,6 +12,10 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+export interface ErrorWithUrl extends Error {
+  url?: string;
+}
+
 interface GhRepo {
   owner: string;
   repo: string;
@@ -28,6 +32,7 @@ export function extractRepoFromURL(url: string): GhRepo | null {
   }
 
   const match = url.match(/^(?:https?:\/\/)?github\.com\/([^/]+)\/([^/?#]+)$/);
+
   if (match) {
     return {
       owner: match[1],

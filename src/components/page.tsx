@@ -22,12 +22,33 @@ import { CheckCircle2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { getDownloadAsset } from "@/lib/searchPkg";
+import { toast } from "sonner";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "./ui/drawer";
+import MarkdownRenderer from "./markdownRenderer";
+import { Label } from "./ui/label";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
-export default function HelloPage() {
+export default function HomePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
+
+  const [apiDocumentation, setApiDocumentation] = useState("");
+
+  useEffect(() => {
+    fetch("/api.md")
+      .then((res) => res.text())
+      .then(setApiDocumentation)
+      .catch(() => setApiDocumentation("文档加载失败"));
+  }, []);
+
   const [submitResult, setSubmitResult] = useState<string>("");
   const [tag, setTag] = useState("");
   const [tagList, setTagList] = useState([
@@ -194,57 +215,63 @@ export default function HelloPage() {
     const url = generateDownloadUrl();
     if (!url) return;
     await navigator.clipboard.writeText(url);
-    alert("Download URL copied to clipboard!");
+    toast(url, {
+      description: "URL has been copied to clipboard!",
+      action: {
+        label: "I got it",
+        onClick: () => console.log("Click I got it!"),
+      },
+    });
   };
 
   return (
     <>
-      {/* Main Content */}
-      <main className="flex-1 container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6 flex flex-col items-center justify-center gap-6 space-y-4">
-        <div className="w-[80%] sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl space-y-10">
-          {submitResult && (
-            <Alert variant="destructive">
-              <CheckCircle2Icon />
-              <AlertTitle>Fail to fetch releases</AlertTitle>
-              <AlertDescription>{submitResult}</AlertDescription>
-            </Alert>
-          )}
+      <div className="w-[80%] sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl space-y-10">
+        {submitResult && (
+          <Alert variant="destructive">
+            <CheckCircle2Icon />
+            <AlertTitle>Fail to fetch releases</AlertTitle>
+            <AlertDescription>{submitResult}</AlertDescription>
+          </Alert>
+        )}
 
-          <Form {...checkForm}>
-            <form
-              onSubmit={checkForm.handleSubmit(onSubmitGetReleases)}
-              className="space-y-4"
-            >
-              <FormField
-                control={checkForm.control}
-                name="repoUrl"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>GitHub repo URL</FormLabel>
-                    <div className="flex gap-2">
-                      <FormControl className="flex-1">
-                        <Input
-                          placeholder="https://github.com/username/repo"
-                          {...field}
-                        />
-                      </FormControl>
-                      <Button
-                        type="submit"
-                        disabled={checkForm.formState.isSubmitting}
-                      >
-                        {checkForm.formState.isSubmitting
-                          ? "Checking..."
-                          : "Check"}
-                      </Button>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </form>
-          </Form>
+        <Form {...checkForm}>
+          <form
+            onSubmit={checkForm.handleSubmit(onSubmitGetReleases)}
+            className="space-y-4"
+          >
+            <FormField
+              control={checkForm.control}
+              name="repoUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>GitHub repo URL</FormLabel>
+                  <div className="flex gap-2">
+                    <FormControl className="flex-1">
+                      <Input
+                        placeholder="https://github.com/username/repo"
+                        {...field}
+                      />
+                    </FormControl>
+                    <Button
+                      type="submit"
+                      disabled={checkForm.formState.isSubmitting}
+                    >
+                      {checkForm.formState.isSubmitting
+                        ? "Checking..."
+                        : "Check"}
+                    </Button>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </form>
+        </Form>
 
-          <div className="flex flex-col gap-2 space-y-8">
+        <div className="flex flex-col gap-2 space-y-8">
+          <div className="space-y-2">
+            <Label>Tag</Label>
             <Combobox
               getter={{ value: tag }}
               options={tagList.map((tag) => ({
@@ -254,19 +281,37 @@ export default function HelloPage() {
               setter={setTag}
               defaultValue="Select tag"
             />
+          </div>
+          <div className="space-y-2">
+            <Label>Asset</Label>
             <Combobox
               getter={{ value: asset }}
               options={assetList}
               setter={setAsset}
               defaultValue="Select download asset"
             />
-            <Button onClick={handleDownload}>Download</Button>
-            <Button onClick={handleCopyDownloadUrl}>
-              Generate Download URL
-            </Button>
           </div>
+          <Button onClick={handleDownload}>Download</Button>
+          <Button onClick={handleCopyDownloadUrl}>Generate Download URL</Button>
+
+          <Drawer>
+            <DrawerTrigger>API Documentation</DrawerTrigger>
+            <DrawerContent>
+              <DrawerHeader>
+                <DrawerTitle>API of ghproxy-plus</DrawerTitle>
+              </DrawerHeader>
+              {/* ui shit */}
+              {/* In HTML, <div> cannot be a descendant of <p>. This will cause a hydration error. */}
+              {/* <DrawerDescription> */}
+              <div className="m-5">
+                <MarkdownRenderer content={apiDocumentation} />
+              </div>
+              {/* </DrawerDescription> */}
+              <DrawerFooter></DrawerFooter>
+            </DrawerContent>
+          </Drawer>
         </div>
-      </main>
+      </div>
     </>
   );
 }

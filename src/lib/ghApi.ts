@@ -1,6 +1,6 @@
 import { GhRelease, GhTag } from "./ghResponse";
 import { LRUCache } from "next/dist/server/lib/lru-cache";
-import { isServer } from "./utils";
+import { ErrorWithUrl, isServer } from "./utils";
 
 interface ReleasesCache {
   releases: GhRelease[];
@@ -21,8 +21,13 @@ const getRepoTags = async (owner: string, repo: string): Promise<GhTag[]> => {
   );
 
   if (!response.ok) {
-    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-    const error = new Error(`Network response was not ok: ${response.status}`) as GhApiError;
+    const errorData = (await response.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    const error = new Error(
+      `Network response was not ok: ${response.status}`
+    ) as GhApiError;
     error.status = response.status;
     error.response = response;
     error.data = errorData;
@@ -35,7 +40,8 @@ const getRepoTags = async (owner: string, repo: string): Promise<GhTag[]> => {
 
 const getRepoReleases = async (
   owner: string,
-  repo: string
+  repo: string,
+  reqInit: RequestInit = {}
 ): Promise<GhRelease[]> => {
   if (isServer) {
     const cached = cache.get(`${owner}/${repo}`) as ReleasesCache | undefined;
@@ -47,13 +53,27 @@ const getRepoReleases = async (
     }
   }
 
-  const response = await fetch(
-    `https://api.github.com/repos/${owner}/${repo}/releases`
-  );
+  let response;
+  try {
+    response = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/releases`,
+      reqInit
+    );
+  } catch (e) {
+    (
+      e as ErrorWithUrl
+    ).url = `https://api.github.com/repos/${owner}/${repo}/releases`;
+    throw e;
+  }
 
   if (!response.ok) {
-    const errorData = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-    const error = new Error(`Network response was not ok: ${response.status}`) as GhApiError;
+    const errorData = (await response.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    const error = new Error(
+      `Network response was not ok: ${response.status}`
+    ) as GhApiError;
     error.status = response.status;
     error.response = response;
     error.data = errorData;
