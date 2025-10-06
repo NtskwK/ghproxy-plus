@@ -32,6 +32,7 @@ import {
   DrawerTrigger,
 } from "./ui/drawer";
 import MarkdownRenderer from "./markdownRenderer";
+import { Label } from "./ui/label";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
@@ -269,21 +270,27 @@ export default function HomePage() {
         </Form>
 
         <div className="flex flex-col gap-2 space-y-8">
-          <Combobox
-            getter={{ value: tag }}
-            options={tagList.map((tag) => ({
-              label: tag.label,
-              value: tag.releaseId,
-            }))}
-            setter={setTag}
-            defaultValue="Select tag"
-          />
-          <Combobox
-            getter={{ value: asset }}
-            options={assetList}
-            setter={setAsset}
-            defaultValue="Select download asset"
-          />
+          <div className="space-y-2">
+            <Label>Tag</Label>
+            <Combobox
+              getter={{ value: tag }}
+              options={tagList.map((tag) => ({
+                label: tag.label,
+                value: tag.releaseId,
+              }))}
+              setter={setTag}
+              defaultValue="Select tag"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Asset</Label>
+            <Combobox
+              getter={{ value: asset }}
+              options={assetList}
+              setter={setAsset}
+              defaultValue="Select download asset"
+            />
+          </div>
           <Button onClick={handleDownload}>Download</Button>
           <Button onClick={handleCopyDownloadUrl}>Generate Download URL</Button>
 
