@@ -6,12 +6,6 @@
 
 Proxies GitHub resources with CORS headers, allowing accelerated access to GitHub files, releases, and repositories.
 
-**Example:**
-
-```bash
-curl https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/download/v1.0.0/file.zip
-```
-
 ---
 
 ## _2. Smart Download API_
@@ -26,7 +20,7 @@ Automatically detects the user's operating system and architecture from the User
 
 **Example:**
 
-~~curl -L [https://your-domain.com/api/download/https://github.com/owner/repo]~~
+~~curl -L https://[host]/api/download/github.com/owner/repo~~
 
 Don't fetch it! You can only access it through the browser.
 
@@ -48,5 +42,5 @@ Health check endpoint that returns server status information.
 **Example:**
 
 ```bash
-curl https://your-domain.com/api/ping
+curl https://[host]/api/ping
 ```

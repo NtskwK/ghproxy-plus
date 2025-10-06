@@ -17,12 +17,17 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   const renderedMarkdown = md.render(content);
 
   return (
-    <div className="text-left ">
+    <div className="text-left">
       <div
         dangerouslySetInnerHTML={{ __html: renderedMarkdown }}
         className="markdown-content"
+        style={{ maxHeight: "500px", overflowY: "auto", overflowX: "hidden" }}
       />
       <style>{`
+        .markdown-content {
+          word-break: break-word;
+          white-space: pre-wrap;
+        }
         .markdown-content hr {
           margin-bottom: 0.5rem;
         }

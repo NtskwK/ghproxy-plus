@@ -35,7 +35,7 @@ import MarkdownRenderer from "./markdownRenderer";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
-export default function HelloPage() {
+export default function HomePage() {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -292,8 +292,14 @@ export default function HelloPage() {
             <DrawerContent>
               <DrawerHeader>
                 <DrawerTitle>API of ghproxy-plus</DrawerTitle>
-                <MarkdownRenderer content={apiDocumentation} />
               </DrawerHeader>
+              {/* ui shit */}
+              {/* In HTML, <div> cannot be a descendant of <p>. This will cause a hydration error. */}
+              {/* <DrawerDescription> */}
+              <div className="m-5">
+                <MarkdownRenderer content={apiDocumentation} />
+              </div>
+              {/* </DrawerDescription> */}
               <DrawerFooter></DrawerFooter>
             </DrawerContent>
           </Drawer>
