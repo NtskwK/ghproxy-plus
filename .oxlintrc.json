@@ -1,0 +1,6 @@
+{
+    "plugins": [
+        "nextjs",
+        "react-perf"
+    ]
+}
