@@ -73,7 +73,7 @@ const getKeywords = (
   // Add OS keywords
   if (osName) {
     if (osName.toLowerCase() === "android") {
-      keywords.push("android", "armv8", "apk");
+      keywords.push("android", "armv8", "universal", "apk");
     } else if (osName.toLowerCase() === "windows") {
       keywords.push("windows", "win32", "win64", "win", "exe", "msi", "zip");
     } else if (osName.toLowerCase() === "ios") {
@@ -110,7 +110,7 @@ const getKeywords = (
     }
   }
 
-  keywords.push("tar", "zip", "gz", "zst");
+  keywords.push("tar.gz", "zip", "tar.zst");
   return keywords;
 };
 
