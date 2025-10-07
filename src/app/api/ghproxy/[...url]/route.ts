@@ -54,11 +54,7 @@ const exp5 =
 const exp6 = /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/tags.*$/i;
 
 function newUrl(urlStr: string) {
-  try {
-    return new URL(urlStr);
-  } catch (err) {
-    throw err;
-  }
+  return new URL(urlStr);
 }
 
 function checkUrl(u: string) {
@@ -91,7 +87,6 @@ export async function GET(request: Request) {
   if (
     path.search(exp1) === 0 ||
     path.search(exp3) === 0 ||
-    path.search(exp4) === 0 ||
     path.search(exp5) === 0 ||
     path.search(exp6) === 0
   ) {
@@ -107,13 +102,17 @@ export async function GET(request: Request) {
       return httpHandler(request, path);
     }
   } else if (path.search(exp4) === 0) {
-    const newUrl = path
-      .replace(/(?<=com\/.+?\/.+?)\/(.+?\/)/, "@$1")
-      .replace(
-        /^(?:https?:\/\/)?raw\.(?:githubusercontent|github)\.com/,
-        "https://cdn.jsdelivr.net/gh"
-      );
-    return Response.redirect(newUrl, 302);
+    if (Config.jsdelivr) {
+      const newUrl = path
+        .replace(/(?<=com\/.+?\/.+?)\/(.+?\/)/, "@$1")
+        .replace(
+          /^(?:https?:\/\/)?raw\.(?:githubusercontent|github)\.com/,
+          "https://cdn.jsdelivr.net/gh"
+        );
+      return Response.redirect(newUrl, 302);
+    } else {
+      return httpHandler(request, path);
+    }
   } else {
     return NextResponse.json({ error: "bad url" }, { status: 400 });
   }
@@ -133,7 +132,7 @@ function httpHandler(req: Request, pathname: string) {
   const reqHdrNew = new Headers(reqHdrRaw);
 
   let urlStr = pathname;
-  let flag = !Boolean(whiteList.length);
+  let flag = !whiteList.length;
   for (const i of whiteList) {
     if (urlStr.includes(i)) {
       flag = true;

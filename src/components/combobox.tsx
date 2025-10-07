@@ -27,7 +27,7 @@ interface ComboboxProps {
 }
 
 const Combobox: React.FC<ComboboxProps> = ({
-  getter: getter,
+  getter,
   options,
   setter,
   defaultValue = "None",

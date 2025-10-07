@@ -31,9 +31,8 @@ export function extractRepoFromURL(url: string): GhRepo | null {
     return null;
   }
 
-  const match = url.match(
-    /^(?:https?:\/\/)?github\.com\/([^\/]+)\/([^\/?#]+)$/
-  );
+  const match = url.match(/^(?:https?:\/\/)?github\.com\/([^/]+)\/([^/?#]+)$/);
+
   if (match) {
     return {
       owner: match[1],
