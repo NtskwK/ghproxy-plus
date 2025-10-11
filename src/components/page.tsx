@@ -215,8 +215,8 @@ export default function HomePage() {
     const url = generateDownloadUrl();
     if (!url) return;
     await navigator.clipboard.writeText(url);
-    toast(url, {
-      description: "URL has been copied to clipboard!",
+    toast("Done!", {
+      description: "The URL has been copied to clipboard!",
       action: {
         label: "I got it",
         onClick: () => console.log("Click I got it!"),
