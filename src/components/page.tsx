@@ -49,7 +49,8 @@ export default function HomePage() {
       .catch(() => setApiDocumentation("文档加载失败"));
   }, []);
 
-  const [submitResult, setSubmitResult] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [submitResult, setSubmitInfo] = useState("");
   const [tag, setTag] = useState("");
   const [tagList, setTagList] = useState([
     { label: "None", releaseId: "None" },
@@ -127,13 +128,21 @@ export default function HomePage() {
     }
   }, [keyword, ua, tag, releases]);
 
+  const resetAssetAndTag = () => {
+    setTag("");
+    setAsset("");
+    setTagList([{ label: "None", releaseId: "None" }]);
+    setAssetList([{ label: "None", value: "None" }]);
+    setReleases([]);
+  };
+
   const onSubmitGetReleases = async (values: CheckFormValues) => {
+    setLoading(true);
     const repo = extractRepoFromURL(values.repoUrl);
     if (!repo) {
-      setAssetList([{ label: "None", value: "None" }]);
-      setTagList([{ label: "None", releaseId: "None" }]);
-      setReleases([]);
-      setSubmitResult("❌ Invalid GitHub repo URL.");
+      setSubmitInfo("❌ Invalid GitHub repo URL.");
+      resetAssetAndTag();
+      setLoading(false);
       return;
     }
 
@@ -151,16 +160,16 @@ export default function HomePage() {
       setTag(tagNames[0].releaseId);
       setReleases(releases);
       updateSearchParams("repo", values.repoUrl);
-      setSubmitResult("");
+      setSubmitInfo("");
+      setLoading(false);
       return;
     }
 
     getRepoReleases(repo.owner, repo.repo)
       .then((releases) => {
         if (releases.length === 0) {
-          setSubmitResult("❌ No releases found in the repo.");
-          setTagList([{ label: "None", releaseId: "None" }]);
-          setAssetList([{ label: "None", value: "None" }]);
+          setSubmitInfo("❌ No releases found in the repo.");
+          resetAssetAndTag();
           return;
         }
         const tagNames = releases.map((release) => ({
@@ -172,21 +181,22 @@ export default function HomePage() {
         setTag(tagNames[0].releaseId);
         setReleases(releases);
         updateSearchParams("repo", values.repoUrl);
-        setSubmitResult("");
+        setSubmitInfo("");
 
         sessionStorage.setItem(repoKey, JSON.stringify(releases));
       })
       .catch((error) => {
-        setSubmitResult(`❌ Error fetching tags: ${error}`);
-        setTagList([{ label: "None", releaseId: "None" }]);
-        setAssetList([{ label: "None", value: "None" }]);
-        setReleases([]);
+        setSubmitInfo(`❌ Error fetching tags: ${error}`);
+        resetAssetAndTag();
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
   const generateDownloadUrl = () => {
-    if (!asset) {
-      setSubmitResult("❌ No asset selected.");
+    if (!asset || asset === "None") {
+      setSubmitInfo("❌ No asset selected.");
       return;
     }
 
@@ -253,13 +263,8 @@ export default function HomePage() {
                         {...field}
                       />
                     </FormControl>
-                    <Button
-                      type="submit"
-                      disabled={checkForm.formState.isSubmitting}
-                    >
-                      {checkForm.formState.isSubmitting
-                        ? "Checking..."
-                        : "Check"}
+                    <Button type="submit" disabled={loading}>
+                      {loading ? "Checking..." : "Check"}
                     </Button>
                   </div>
                   <FormMessage />
@@ -291,11 +296,25 @@ export default function HomePage() {
               defaultValue="Select download asset"
             />
           </div>
-          <Button onClick={handleDownload}>Download</Button>
-          <Button onClick={handleCopyDownloadUrl}>Generate Download URL</Button>
+          <Button
+            onClick={handleDownload}
+            disabled={!asset || asset === "None" || loading}
+          >
+            Download
+          </Button>
+          <Button
+            onClick={handleCopyDownloadUrl}
+            disabled={!asset || asset === "None" || loading}
+          >
+            Generate Download URL
+          </Button>
 
           <Drawer>
-            <DrawerTrigger>API Documentation</DrawerTrigger>
+            <DrawerTrigger>
+              <p className="text-blue-500 underline cursor-pointer">
+                API Documentation
+              </p>
+            </DrawerTrigger>
             <DrawerContent>
               <DrawerHeader>
                 <DrawerTitle>API of ghproxy-plus</DrawerTitle>
