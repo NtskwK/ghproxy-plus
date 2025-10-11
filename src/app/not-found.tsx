@@ -9,7 +9,7 @@ export default function NotFound() {
       <h1 className="text-6xl font-bold">404</h1>
       <p>
         <span className="text-red-500 font-bold text-2xl">Oops!</span> The page
-        you requested doesn't exist.
+        {"you requested doesn't exist."}
       </p>
       <Button onClick={() => router.push("/")}>Go Home</Button>
     </div>
