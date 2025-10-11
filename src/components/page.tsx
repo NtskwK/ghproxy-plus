@@ -226,10 +226,10 @@ export default function HomePage() {
     if (!url) return;
     await navigator.clipboard.writeText(url);
     toast("Done!", {
-      description: "The URL has been copied to clipboard!",
+      description: "The URL has been copied to clipboard.",
       action: {
-        label: "I got it",
-        onClick: () => console.log("Click I got it!"),
+        label: "get it",
+        onClick: () => console.log("Click get it!"),
       },
     });
   };
