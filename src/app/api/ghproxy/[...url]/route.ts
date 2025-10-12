@@ -53,17 +53,11 @@ const exp5 =
   /^(?:https?:\/\/)?gist\.(?:githubusercontent|github)\.com\/.+?\/.+?\/.+$/i;
 const exp6 = /^(?:https?:\/\/)?github\.com\/.+?\/.+?\/tags.*$/i;
 
-function newUrl(urlStr: string) {
-  return new URL(urlStr);
-}
-
-function checkUrl(u: string) {
-  for (const i of [exp1, exp2, exp3, exp4, exp5, exp6]) {
-    if (u.search(i) === 0) {
-      return true;
-    }
-  }
-  return false;
+function checkUrl(url: string): boolean {
+  const combinedExp = new RegExp(
+    `^(${exp1.source}|${exp2.source}|${exp3.source}|${exp4.source}|${exp5.source}|${exp6.source})`
+  );
+  return combinedExp.test(url);
 }
 
 export async function GET(request: Request) {
@@ -84,14 +78,14 @@ export async function GET(request: Request) {
   log("request url:", request.url);
   log("urlObj.origin:", urlObj.origin);
   log("new url:", path);
-  if (
-    path.search(exp1) === 0 ||
-    path.search(exp3) === 0 ||
-    path.search(exp5) === 0 ||
-    path.search(exp6) === 0
-  ) {
+
+  const combinedExp = new RegExp(
+    `^(${exp1.source}|${exp3.source}|${exp5.source}|${exp6.source})`
+  );
+
+  if (combinedExp.test(path)) {
     return httpHandler(request, path);
-  } else if (path.search(exp2) === 0) {
+  } else if (exp2.test(path)) {
     if (Config.jsdelivr) {
       const newUrl = path
         .replace("/blob/", "@")
@@ -101,7 +95,7 @@ export async function GET(request: Request) {
       path = path.replace("/blob/", "/raw/");
       return httpHandler(request, path);
     }
-  } else if (path.search(exp4) === 0) {
+  } else if (exp4.test(path)) {
     if (Config.jsdelivr) {
       const newUrl = path
         .replace(/(?<=com\/.+?\/.+?)\/(.+?\/)/, "@$1")
@@ -119,44 +113,43 @@ export async function GET(request: Request) {
 }
 
 function httpHandler(req: Request, pathname: string) {
-  const reqHdrRaw = req.headers;
-
   // preflight
   if (
     req.method === "OPTIONS" &&
-    reqHdrRaw.has("access-control-request-headers")
+    req.headers.has("access-control-request-headers")
   ) {
     return new Response(null, PREFLIGHT_INIT);
   }
 
-  const reqHdrNew = new Headers(reqHdrRaw);
-
-  let urlStr = pathname;
-  let flag = !whiteList.length;
-  for (const i of whiteList) {
-    if (urlStr.includes(i)) {
-      flag = true;
-      break;
+  if (whiteList.length) {
+    const isAllowed = whiteList.some((item) => pathname.includes(item));
+    if (!isAllowed) {
+      return new Response("blocked", { status: 403 });
     }
   }
-  if (!flag) {
-    return new Response("blocked", { status: 403 });
-  }
-  if (urlStr.search(/^https?:\/\//) !== 0) {
+
+  const HTTP_REGEX = /^https?:\/\//;
+
+  let urlStr = pathname;
+  if (!HTTP_REGEX.test(urlStr)) {
     urlStr = "https://" + urlStr;
   }
-  const urlObj = newUrl(urlStr);
-  if (!urlObj) {
+
+  try {
+    const urlObj = new URL(urlStr);
+
+    // 直接使用原请求头，避免不必要的Headers对象创建
+    const reqInit = {
+      method: req.method,
+      headers: req.headers, // 直接使用原headers
+      redirect: "manual",
+      body: req.body,
+    } as RequestInit;
+
+    return proxy(urlObj, reqInit);
+  } catch {
     return new Response("bad url", { status: 400 });
   }
-
-  const reqInit = {
-    method: req.method,
-    headers: reqHdrNew,
-    redirect: "manual",
-    body: req.body,
-  } as RequestInit;
-  return proxy(urlObj, reqInit);
 }
 
 async function proxy(urlObj: URL, reqInit: RequestInit) {
@@ -179,7 +172,7 @@ async function proxy(urlObj: URL, reqInit: RequestInit) {
       if (checkUrl(_location))
         resHdrNew.set("location", GHPROXY_PATH + _location);
       else {
-        const u = newUrl(_location);
+        const u = new URL(_location);
         if (u) {
           reqInit.redirect = "follow";
           return proxy(u, reqInit);
