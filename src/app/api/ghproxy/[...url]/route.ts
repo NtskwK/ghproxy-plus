@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 import { NextResponse } from "next/server";
-import { log } from "node:console";
 
 // 前缀，如果自定义路由为example.com/gh/*，将PREFIX改为 '/gh/'，注意，少一个杠都会错！
 import { GHPROXY_PATH } from "@/lib/utils";
@@ -74,10 +73,6 @@ export async function GET(request: Request) {
   path = urlObj.href
     .slice(urlObj.origin.length + GHPROXY_PATH.length)
     .replace(/^https?:\/+/, "https://");
-
-  log("request url:", request.url);
-  log("urlObj.origin:", urlObj.origin);
-  log("new url:", path);
 
   const combinedExp = new RegExp(
     `^(${exp1.source}|${exp3.source}|${exp5.source}|${exp6.source})`
