@@ -1,4 +1,4 @@
-import { GhRelease, GhTag } from "./ghResponse";
+import { GhRelease, GhReleaseAssets, GhTag } from "./ghResponse";
 import { LRUCache } from "next/dist/server/lib/lru-cache";
 import { ErrorWithUrl, isServer } from "./utils";
 
@@ -98,6 +98,20 @@ const getRepoReleases = async (
   return data;
 };
 
+const getSourceCode = (
+  owner: string,
+  repo: string,
+  tag: string
+): GhReleaseAssets[] => {
+  // https://github.com/MAA1999/M9A/archive/refs/tags/v3.14.0.zip
+  const suffixes = [".tar.gz", ".zip"];
+  const assets = suffixes.map((suffix) => ({
+    name: `SourceCode-${tag}${suffix}`,
+    browser_download_url: `https://github.com/${owner}/${repo}/archive/refs/tags/${tag}${suffix}`,
+  })) as GhReleaseAssets[];
+  return assets;
+};
+
 const getLatestRelease = async (
   owner: string,
   repo: string
@@ -106,4 +120,4 @@ const getLatestRelease = async (
   return releases[0] || null;
 };
 
-export { getRepoTags, getRepoReleases, getLatestRelease };
+export { getRepoTags, getRepoReleases, getLatestRelease, getSourceCode };

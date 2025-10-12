@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { extractRepoFromURL } from "@/lib/utils";
-import { getRepoReleases } from "@/lib/ghApi";
+import { getRepoReleases, getSourceCode } from "@/lib/ghApi";
 import { CheckFormSchema } from "./lib";
 import Combobox from "./combobox";
 import { GhRelease } from "@/lib/ghResponse";
@@ -97,10 +97,21 @@ export default function HomePage() {
     console.log("Processing tag:", tag);
     const release = releases.find((release) => release.id.toString() === tag);
     if (release) {
+      const sourceCodeAssets = getSourceCode(
+        extractRepoFromURL(checkForm.getValues("repoUrl"))!.owner,
+        extractRepoFromURL(checkForm.getValues("repoUrl"))!.repo,
+        release.tag_name
+      );
+
+      release.assets = [...release.assets, ...sourceCodeAssets];
+      console.debug("Source code assets:", sourceCodeAssets);
+      console.debug("Release assets:", release.assets);
+
       const assets = release.assets.map((asset) => ({
         label: asset.name,
         value: asset.browser_download_url,
       }));
+
       setAssetList(assets);
       setAsset(assets[0]?.value || "");
 
@@ -110,7 +121,7 @@ export default function HomePage() {
         setAsset(downloadAsset.browser_download_url);
       }
     }
-  }, [tag, releases, ua, keyword]);
+  }, [tag, releases, ua, keyword, checkForm]);
 
   useEffect(() => {
     if (tag && tag !== "None" && tag !== "" && releases.length > 0) {
