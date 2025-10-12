@@ -43,6 +43,7 @@ const getRepoReleases = async (
   repo: string,
   reqInit: RequestInit = {}
 ): Promise<GhRelease[]> => {
+  // cache for client is handled by browser storage
   if (isServer) {
     const cached = cache.get(`${owner}/${repo}`) as ReleasesCache | undefined;
     if (cached) {
@@ -71,9 +72,16 @@ const getRepoReleases = async (
       string,
       unknown
     >;
-    const error = new Error(
-      `Network response was not ok: ${response.status}`
-    ) as GhApiError;
+    let error: GhApiError;
+    if (response.status === 403) {
+      error = new Error(
+        `API rate limit exceeded for GitHub API (status: ${response.status}).\nDon't use a proxy to access the API!`
+      ) as GhApiError;
+    } else {
+      error = new Error(
+        `Network response was not ok: ${response.status}`
+      ) as GhApiError;
+    }
     error.status = response.status;
     error.response = response;
     error.data = errorData;
