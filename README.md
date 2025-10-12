@@ -4,6 +4,12 @@ A GitHub release asset download service inspired by gh-proxy
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Archived
+
+**The old version is archived now. See v1 branch for the old version.**
+
+v2 is still in development.🚧
+
 ## Deploy
 
 ### Cloudflare Workers (Recommended)

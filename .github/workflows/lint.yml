@@ -14,26 +14,30 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run markdownlint
-        uses: DavidAnson/markdownlint-cli2-action@v18
+      - name: Markdown lint
+        uses: DavidAnson/markdownlint-cli2-action@v20
         with:
-          globs: "**/*.md"
+          globs: |
+            "**/*.md"
 
-  oxlint:
-    name: OXLint
+  code-lint:
+    name: Code Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4.1.0
+
+      - name: Set node LTS
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
-          cache: "npm"
+          node-version: lts/*
+          cache: pnpm
+            
+      - name: Install
+        run: pnpm install
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run oxlint
-        run: npm run lint
+      - name: Lint
+        run: pnpm biome ci
