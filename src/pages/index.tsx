@@ -216,7 +216,7 @@ export default function HomePage() {
     const port = window.location.port;
 
     const baseUrl = `${protocol}//${hostname}${port ? ":" + port : ""}`;
-    const url = baseUrl + "/api/ghproxy/" + asset;
+    const url = baseUrl + "/ghproxy/" + asset;
     console.log("Generated URL: ", url);
     return url;
   };

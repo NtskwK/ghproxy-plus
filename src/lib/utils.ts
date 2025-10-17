@@ -3,7 +3,7 @@ import { twMerge } from "tailwind-merge";
 import { UAParser } from "ua-parser-js";
 import { CPUArch } from "ua-parser-js/enums";
 
-export const GHPROXY_PATH = "/api/ghproxy/";
+export const GHPROXY_PATH = "/ghproxy/";
 
 export const isClient = typeof window !== "undefined";
 export const isServer = !isClient;

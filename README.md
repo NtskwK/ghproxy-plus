@@ -65,7 +65,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ### 1. GitHub Proxy API
 
-**Endpoint:** `/api/ghproxy/{github-url}`
+**Endpoint:** `/ghproxy/{github-url}`
 
 Proxies GitHub resources with CORS headers, allowing accelerated access to GitHub files, releases, and repositories.
 
@@ -81,7 +81,7 @@ Proxies GitHub resources with CORS headers, allowing accelerated access to GitHu
 **Example:**
 
 ```bash
-curl https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/api/download/v1.0.0/file.zip
+curl https://your-domain.com/ghproxy/https://github.com/owner/repo/releases/api/download/v1.0.0/file.zip
 ```
 
 **Response:**
@@ -118,7 +118,7 @@ Don't fetch it! You can only access it through the browser.
 
 **Response:**
 
-- Success (302): Redirects to the download URL via `/api/ghproxy/`
+- Success (302): Redirects to the download URL via `/ghproxy/`
 - Error (302): Redirects to 404 page if repo not found or no suitable asset
 
 ---
