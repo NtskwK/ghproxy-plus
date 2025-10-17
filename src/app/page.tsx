@@ -1,6 +1,6 @@
 "use client";
 import { Suspense } from "react";
-import HomePage from "../components/page";
+import HomePage from "@/pages/index";
 import { Toaster } from "@/components/ui/sonner";
 
 export default function Home() {

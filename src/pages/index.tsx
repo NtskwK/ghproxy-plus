@@ -14,10 +14,10 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { extractRepoFromURL } from "@/lib/utils";
 import { getRepoReleases, getSourceCode } from "@/lib/ghApi";
-import { CheckFormSchema } from "./lib";
-import Combobox from "./combobox";
+import { CheckFormSchema } from "@/components/lib";
+import Combobox from "@/components/combobox";
 import { GhRelease } from "@/lib/ghResponse";
-import { Alert, AlertDescription, AlertTitle } from "./ui/alert";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -30,9 +30,9 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "./ui/drawer";
-import MarkdownRenderer from "./markdownRenderer";
-import { Label } from "./ui/label";
+} from "@/components/ui/drawer";
+import MarkdownRenderer from "../markdownRenderer";
+import { Label } from "@/components/ui/label";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 

@@ -95,7 +95,7 @@ curl https://your-domain.com/api/ghproxy/https://github.com/owner/repo/releases/
 
 ### 2. Smart Download API
 
-**Endpoint:** `/api/download/{github-repo-url}`
+**Endpoint:** `/download/{github-repo-url}`
 
 Automatically detects the user's operating system and architecture from the User-Agent header and downloads the most appropriate release asset from the latest release.
 
@@ -105,7 +105,7 @@ Automatically detects the user's operating system and architecture from the User
 
 **Example:**
 
-~~curl -L [https://your-domain.com/api/download/https://github.com/owner/repo]~~
+~~curl -L [https://your-domain.com/download/https://github.com/owner/repo]~~
 
 Don't fetch it! You can only access it through the browser.
 

@@ -5,7 +5,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { GHPROXY_PATH } from "@/lib/utils";
 
-const PREFIX = "/api/download/";
+const PREFIX = "/download/";
 
 export async function GET(request: Request) {
   const headersObj = await headers();
