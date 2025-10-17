@@ -31,7 +31,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import MarkdownRenderer from "../markdownRenderer";
+import MarkdownRenderer from "../../markdownRenderer";
 import { Label } from "@/components/ui/label";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
