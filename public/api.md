@@ -10,7 +10,7 @@ Proxies GitHub resources with CORS headers, allowing accelerated access to GitHu
 
 ## _2. Smart Download API_
 
-**Endpoint:** `/download/{github-repo-url}`
+**Endpoint:** `/api/download/{github-repo-url}`
 
 Automatically detects the user's operating system and architecture from the User-Agent header and downloads the most appropriate release asset from the latest release.
 
@@ -20,7 +20,7 @@ Automatically detects the user's operating system and architecture from the User
 
 **Example:**
 
-~~curl -L https://[host]/download/github.com/owner/repo~~
+~~curl -L https://[host]/api/download/github.com/owner/repo~~
 
 Don't fetch it! You can only access it through the browser.
 
