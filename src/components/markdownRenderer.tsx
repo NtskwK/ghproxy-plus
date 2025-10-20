@@ -1,16 +1,12 @@
-import React from "react";
+import type React from "react";
 import ReactMarkdown from "react-markdown";
 
 interface MarkdownRendererProps {
-  content: string;
+    content: string;
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
-  return (
-    <>
-      <ReactMarkdown>{content}</ReactMarkdown>
-    </>
-  );
+    return <ReactMarkdown>{content}</ReactMarkdown>;
 };
 
 export default MarkdownRenderer;
