@@ -10,6 +10,9 @@ export default defineConfig({
       alias: {
         "@": path.join(process.cwd(), "src"),
       }
+    },
+    assets: {
+      include: ["md"],
     }
   }
 });

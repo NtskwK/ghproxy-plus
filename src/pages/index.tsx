@@ -32,6 +32,7 @@ import {
 import MarkdownRenderer from "@/components/markdownRenderer";
 import { Label } from "@/components/ui/label";
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import apiDocumentationUrl from "@/assets/api.md";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
@@ -41,12 +42,8 @@ export default function Homepage() {
 
   const [apiDocumentation, setApiDocumentation] = useState("");
 
-  useEffect(() => {
-    fetch("/public/api.md")
-      .then((res) => res.text())
-      .then(setApiDocumentation)
-      .catch(() => setApiDocumentation("文档加载失败"));
-  }, []);
+
+
 
   const [loading, setLoading] = useState(false);
   const [submitResult, setSubmitInfo] = useState("");
@@ -79,6 +76,13 @@ export default function Homepage() {
     }
     navigate(`?${params.toString()}`);
   };
+
+  useEffect(() => {
+    fetch(apiDocumentationUrl)
+      .then((res) => res.text())
+      .then(setApiDocumentation)
+      .catch(() => setApiDocumentation("文档加载失败"));
+  }, []);
 
   useEffect(() => {
     const url = searchParams.get("repo");
