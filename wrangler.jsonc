@@ -2,7 +2,14 @@
     "$schema": "node_modules/wrangler/config-schema.json",
     "name": "gpp-hono",
     "main": "src/api.ts",
-    "compatibility_date": "2025-10-12",
+    "compatibility_date": "2025-09-17",
+    "compatibility_flags": [
+        "nodejs_compat"
+    ],
+    "assets": {
+        "directory": "./dist",
+        "binding": "ASSETS"
+    },
     "observability": {
         "enabled": false,
         "head_sampling_rate": 1,

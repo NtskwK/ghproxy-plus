@@ -1,20 +1,35 @@
 {
-    "name": "gpp-hono",
-    "type": "module",
-    "scripts": {
-        "dev": "wrangler dev",
-        "deploy": "wrangler deploy --minify",
-        "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-        "lint": "biome check ."
-    },
-    "dependencies": {
-        "hono": "^4.9.9",
-        "lru-cache": "^11.2.2",
-        "ua-parser-js": "^2.0.6"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "2.2.5",
-        "@types/node": "^24.7.2",
-        "wrangler": "^4.4.0"
-    }
+	"name": "gpp-hono",
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "pnpm build && wrangler deploy --minify",
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+		"check": "biome check --write",
+		"dev:front": "farm start",
+		"build": "farm build",
+		"format": "prettier --write .",
+		"lint": "eslint .",
+		"preview": "farm preview"
+	},
+	"dependencies": {
+		"@hono/node-server": "^1.19.5",
+		"hono": "^4.9.9",
+		"lru-cache": "^11.2.2",
+		"react": "^19.2.0",
+		"react-dom": "^19.2.0",
+		"ua-parser-js": "^2.0.6"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.2.5",
+		"@farmfe/cli": "^1.0.4",
+		"@farmfe/core": "^1.6.7",
+		"@farmfe/plugin-react": "^1.2.0",
+		"@types/node": "^24.7.2",
+		"@types/react": "18",
+		"@types/react-dom": "^19.2.2",
+		"core-js": "^3.36.1",
+		"react-refresh": "^0.14.0",
+		"wrangler": "^4.4.0"
+	}
 }
