@@ -3,6 +3,6 @@ import apiRouter from "./api/route";
 
 const app = new Hono();
 
-app.route("/api/*", apiRouter);
+app.route("/api", apiRouter);
 
 export default app;
