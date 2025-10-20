@@ -1,20 +1,20 @@
 {
-    "$schema": "node_modules/wrangler/config-schema.json",
-    "name": "gpp-hono",
-    "main": "src/api.ts",
-    "compatibility_date": "2025-09-17",
-    "compatibility_flags": ["nodejs_compat"],
-    "assets": {
-        "directory": "./dist",
-        "binding": "ASSETS"
-    },
-    "observability": {
-        "enabled": false,
-        "head_sampling_rate": 1,
-        "logs": {
-            "enabled": true,
-            "head_sampling_rate": 1,
-            "invocation_logs": true
-        }
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "gpp-hono",
+  "main": "src/api.ts",
+  "compatibility_date": "2025-09-17",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": false,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true
     }
+  }
 }

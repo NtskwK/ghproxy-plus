@@ -17,7 +17,7 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
+  DrawerTrigger
 } from "@/components/ui/drawer";
 import {
   Form,
@@ -25,7 +25,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
+  FormMessage
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -46,19 +46,19 @@ export default function Homepage() {
   const [submitResult, setSubmitInfo] = useState("");
   const [tag, setTag] = useState("");
   const [tagList, setTagList] = useState([
-    { label: "None", releaseId: "None" },
+    { label: "None", releaseId: "None" }
   ]);
   const [releases, setReleases] = useState<GhRelease[]>([]);
   const [asset, setAsset] = useState("");
   const [assetList, setAssetList] = useState([
-    { label: "None", value: "None" },
+    { label: "None", value: "None" }
   ]);
 
   const checkForm = useForm<CheckFormValues>({
     // don't use resolver here to avoid packup error
     defaultValues: {
-      repoUrl: "",
-    },
+      repoUrl: ""
+    }
   });
 
   const ua = typeof navigator !== "undefined" ? navigator.userAgent : "";
@@ -95,14 +95,12 @@ export default function Homepage() {
     }
 
     console.log("Processing tag:", tag);
-    const release = releases.find(
-      (release) => release.id.toString() === tag,
-    );
+    const release = releases.find((release) => release.id.toString() === tag);
     if (release) {
       const sourceCodeAssets = getSourceCode(
         extractRepoFromURL(checkForm.getValues("repoUrl"))?.owner || "",
         extractRepoFromURL(checkForm.getValues("repoUrl"))?.repo || "",
-        release.tag_name,
+        release.tag_name
       );
       release.assets = [...release.assets, ...sourceCodeAssets];
       console.debug("Source code assets:", sourceCodeAssets);
@@ -111,7 +109,7 @@ export default function Homepage() {
 
       const assets = release.assets.map((asset) => ({
         label: asset.name,
-        value: asset.browser_download_url,
+        value: asset.browser_download_url
       }));
 
       setAssetList(assets);
@@ -127,20 +125,14 @@ export default function Homepage() {
 
   useEffect(() => {
     if (tag && tag !== "None" && tag !== "" && releases.length > 0) {
-      const release = releases.find(
-        (release) => release.id.toString() === tag,
-      );
+      const release = releases.find((release) => release.id.toString() === tag);
       if (release && release.assets.length > 0) {
-        const downloadAsset = getDownloadAsset(
-          release.assets,
-          ua,
-          keyword,
-        );
+        const downloadAsset = getDownloadAsset(release.assets, ua, keyword);
         if (downloadAsset) {
           setAsset(downloadAsset.browser_download_url);
           console.debug(
             "Auto-selected asset based on keyword:",
-            downloadAsset.name,
+            downloadAsset.name
           );
         }
       }
@@ -172,7 +164,7 @@ export default function Homepage() {
       const releases = JSON.parse(cached) as GhRelease[];
       const tagNames = releases.map((release) => ({
         label: release.name,
-        releaseId: release.id.toString(),
+        releaseId: release.id.toString()
       }));
       tagNames[0].label += " (latest)";
       setTagList(tagNames.slice(0, 5)); // Show only first 5 tags
@@ -193,7 +185,7 @@ export default function Homepage() {
         }
         const tagNames = releases.map((release) => ({
           label: release.name,
-          releaseId: release.id.toString(),
+          releaseId: release.id.toString()
         }));
         tagNames[0].label += " (latest)";
         setTagList(tagNames.slice(0, 5)); // Show only first 5 tags
@@ -244,8 +236,8 @@ export default function Homepage() {
       description: "The URL has been copied to clipboard.",
       action: {
         label: "get it",
-        onClick: () => console.log("Click get it!"),
-      },
+        onClick: () => console.log("Click get it!")
+      }
     });
   };
 
@@ -295,7 +287,7 @@ export default function Homepage() {
             getter={{ value: tag }}
             options={tagList.map((tag) => ({
               label: tag.label,
-              value: tag.releaseId,
+              value: tag.releaseId
             }))}
             setter={setTag}
             defaultValue="Select tag"
