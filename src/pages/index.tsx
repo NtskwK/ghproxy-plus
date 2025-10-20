@@ -42,7 +42,7 @@ export default function Homepage() {
   const [apiDocumentation, setApiDocumentation] = useState("");
 
   useEffect(() => {
-    fetch("/api.md")
+    fetch("/public/api.md")
       .then((res) => res.text())
       .then(setApiDocumentation)
       .catch(() => setApiDocumentation("文档加载失败"));
