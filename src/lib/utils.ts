@@ -1,5 +1,11 @@
 import { UAParser } from "ua-parser-js";
 import type { CPUArch } from "ua-parser-js/enums";
+import { clsx, type ClassValue } from "clsx"
+import { twMerge } from "tailwind-merge"
+
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs))
+}
 
 export const GHPROXY_PATH = "/api/ghproxy/";
 
