@@ -4,7 +4,7 @@ const Header = () => {
     <>
       <header className="bg-primary text-primary-foreground p-6 shadow-md">
         <div className="container mx-auto relative flex justify-center items-center">
-          <h1 className="text-4xl font-bold">ghproxy plus</h1>
+          <h1 className="text-4xl font-bold">{process.env.FARM_SITENAME}</h1>
 
           <div
             className="cursor-pointer hover:opacity-80 transition-opacity duration-200"
