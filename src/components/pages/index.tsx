@@ -19,26 +19,26 @@ import Combobox from "@/components/combobox";
 import { GhRelease } from "@/lib/ghResponse";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { CheckCircle2Icon } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
 import { getDownloadAsset } from "@/lib/searchPkg";
 import { toast } from "sonner";
 import {
   Drawer,
   DrawerContent,
+  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import MarkdownRenderer from "../../markdownRenderer";
+import MarkdownRenderer from "@/components/markdownRenderer";
 import { Label } from "@/components/ui/label";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
 
 export default function HomePage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
+  const [searchParams, _] = useSearchParams();
+  const navigate = useNavigate();
 
   const [apiDocumentation, setApiDocumentation] = useState("");
 
@@ -78,7 +78,7 @@ export default function HomePage() {
     } else {
       params.delete(key);
     }
-    router.push(`?${params.toString()}`);
+    navigate(`?${params.toString()}`);
   };
 
   useEffect(() => {
@@ -332,11 +332,12 @@ export default function HomePage() {
               </DrawerHeader>
               {/* ui shit */}
               {/* In HTML, <div> cannot be a descendant of <p>. This will cause a hydration error. */}
-              {/* <DrawerDescription> */}
               <div className="m-5">
                 <MarkdownRenderer content={apiDocumentation} />
               </div>
-              {/* </DrawerDescription> */}
+              <DrawerDescription>
+                Made by Ntskwk
+              </DrawerDescription>
               <DrawerFooter></DrawerFooter>
             </DrawerContent>
           </Drawer>
