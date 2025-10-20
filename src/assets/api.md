@@ -2,7 +2,7 @@
 
 ## 1. _gh-proxy API_
 
-**Endpoint:** `/ghproxy/{github-url}`
+**Endpoint:** `/api/ghproxy/{github-url}`
 
 Proxies GitHub resources with CORS headers, allowing accelerated access to GitHub files, releases, and repositories.
 

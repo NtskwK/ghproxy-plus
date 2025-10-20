@@ -23,7 +23,7 @@ import type { Context, HonoRequest } from "hono";
 // SOFTWARE.
 
 // 前缀，如果自定义路由为example.com/gh/*，将PREFIX改为 '/gh/'，注意，少一个杠都会错！
-const GHPROXY_PATH = "/ghproxy/";
+const GHPROXY_PATH = "/api/ghproxy/";
 
 // 分支文件使用jsDelivr镜像的开关，0为关闭，默认关闭
 const Config = {
