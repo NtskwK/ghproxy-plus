@@ -1,12 +1,12 @@
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from "react-router-dom";
 
-import './globals.css';
+import "./globals.css";
 
-import Homepage from './pages';
-import Header from './components/header';
-import Footer from './components/footer';
-import { Toaster } from 'sonner';
-import { Suspense } from 'react';
+import Homepage from "./pages";
+import Header from "./components/header";
+import Footer from "./components/footer";
+import { Toaster } from "sonner";
+import { Suspense } from "react";
 
 export function Main() {
   return (
@@ -15,7 +15,6 @@ export function Main() {
         <Header />
         <BrowserRouter>
           <main className="flex-1 container mx-auto px-6 sm:px-8 lg:px-12 xl:px-16 py-6 flex flex-col items-center justify-center gap-6 space-y-4">
-
             <Toaster position="top-center" />
             <Suspense fallback={<div>Loading...</div>}>
               <Homepage />

@@ -37,7 +37,7 @@ jobs:
         with:
           node-version: latest
           cache: pnpm
-            
+
       - name: Install
         run: pnpm install
 

@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/drawer";
 import MarkdownRenderer from "@/components/markdownRenderer";
 import { Label } from "@/components/ui/label";
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from "react-router-dom";
 import apiDocumentationUrl from "@/assets/api.md";
 
 type CheckFormValues = z.infer<typeof CheckFormSchema>;
@@ -41,9 +41,6 @@ export default function Homepage() {
   const navigate = useNavigate();
 
   const [apiDocumentation, setApiDocumentation] = useState("");
-
-
-
 
   const [loading, setLoading] = useState(false);
   const [submitResult, setSubmitInfo] = useState("");
@@ -103,7 +100,7 @@ export default function Homepage() {
       const sourceCodeAssets = getSourceCode(
         extractRepoFromURL(checkForm.getValues("repoUrl"))!.owner,
         extractRepoFromURL(checkForm.getValues("repoUrl"))!.repo,
-        release.tag_name
+        release.tag_name,
       );
 
       release.assets = [...release.assets, ...sourceCodeAssets];
@@ -135,7 +132,7 @@ export default function Homepage() {
           setAsset(downloadAsset.browser_download_url);
           console.debug(
             "Auto-selected asset based on keyword:",
-            downloadAsset.name
+            downloadAsset.name,
           );
         }
       }

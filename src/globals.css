@@ -48,15 +48,20 @@
   --shadow-color: hsl(173, 80%, 40%);
   --shadow-2xs: 0px 4px 10px 0px hsl(173 80% 40% / 0.07);
   --shadow-xs: 0px 4px 10px 0px hsl(173 80% 40% / 0.07);
-  --shadow-sm: 0px 4px 10px 0px hsl(173 80% 40% / 0.15),
+  --shadow-sm:
+    0px 4px 10px 0px hsl(173 80% 40% / 0.15),
     0px 1px 2px -1px hsl(173 80% 40% / 0.15);
-  --shadow: 0px 4px 10px 0px hsl(173 80% 40% / 0.15),
+  --shadow:
+    0px 4px 10px 0px hsl(173 80% 40% / 0.15),
     0px 1px 2px -1px hsl(173 80% 40% / 0.15);
-  --shadow-md: 0px 4px 10px 0px hsl(173 80% 40% / 0.15),
+  --shadow-md:
+    0px 4px 10px 0px hsl(173 80% 40% / 0.15),
     0px 2px 4px -1px hsl(173 80% 40% / 0.15);
-  --shadow-lg: 0px 4px 10px 0px hsl(173 80% 40% / 0.15),
+  --shadow-lg:
+    0px 4px 10px 0px hsl(173 80% 40% / 0.15),
     0px 4px 6px -1px hsl(173 80% 40% / 0.15);
-  --shadow-xl: 0px 4px 10px 0px hsl(173 80% 40% / 0.15),
+  --shadow-xl:
+    0px 4px 10px 0px hsl(173 80% 40% / 0.15),
     0px 8px 10px -1px hsl(173 80% 40% / 0.15);
   --shadow-2xl: 0px 4px 10px 0px hsl(173 80% 40% / 0.38);
   --tracking-normal: 0em;
@@ -108,15 +113,20 @@
   --shadow-color: hsl(173, 80%, 55%);
   --shadow-2xs: 0px 5px 12px 0px hsl(173 80% 55% / 0.13);
   --shadow-xs: 0px 5px 12px 0px hsl(173 80% 55% / 0.13);
-  --shadow-sm: 0px 5px 12px 0px hsl(173 80% 55% / 0.25),
+  --shadow-sm:
+    0px 5px 12px 0px hsl(173 80% 55% / 0.25),
     0px 1px 2px -1px hsl(173 80% 55% / 0.25);
-  --shadow: 0px 5px 12px 0px hsl(173 80% 55% / 0.25),
+  --shadow:
+    0px 5px 12px 0px hsl(173 80% 55% / 0.25),
     0px 1px 2px -1px hsl(173 80% 55% / 0.25);
-  --shadow-md: 0px 5px 12px 0px hsl(173 80% 55% / 0.25),
+  --shadow-md:
+    0px 5px 12px 0px hsl(173 80% 55% / 0.25),
     0px 2px 4px -1px hsl(173 80% 55% / 0.25);
-  --shadow-lg: 0px 5px 12px 0px hsl(173 80% 55% / 0.25),
+  --shadow-lg:
+    0px 5px 12px 0px hsl(173 80% 55% / 0.25),
     0px 4px 6px -1px hsl(173 80% 55% / 0.25);
-  --shadow-xl: 0px 5px 12px 0px hsl(173 80% 55% / 0.25),
+  --shadow-xl:
+    0px 5px 12px 0px hsl(173 80% 55% / 0.25),
     0px 8px 10px -1px hsl(173 80% 55% / 0.25);
   --shadow-2xl: 0px 5px 12px 0px hsl(173 80% 55% / 0.63);
 }

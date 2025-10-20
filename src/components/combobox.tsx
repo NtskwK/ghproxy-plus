@@ -48,7 +48,7 @@ const Combobox: React.FC<ComboboxProps> = ({
       role="combobox"
       className={cn(
         "w-full justify-between",
-        !getter.value && "text-muted-foreground"
+        !getter.value && "text-muted-foreground",
       )}
       onClick={() => setOpen(true)}
     >
@@ -90,7 +90,7 @@ const Combobox: React.FC<ComboboxProps> = ({
                         "ml-auto",
                         item.value === getter.value
                           ? "opacity-100"
-                          : "opacity-0"
+                          : "opacity-0",
                       )}
                     />
                   </CommandItem>
