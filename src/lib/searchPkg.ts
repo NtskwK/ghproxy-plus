@@ -88,16 +88,14 @@ const getKeywords = (
         osName.toLowerCase() === "mint" ||
         osName.toLowerCase() === "deepin"
       ) {
-        keywords.push("debian", "unknown", "deb", "ubuntu", "mint");
+        keywords.push("debian", "deb", "ubuntu", "mint");
       } else if (
         osName.toLowerCase() === "centos" ||
         osName.toLowerCase() === "redhat"
       ) {
         keywords.push("centos", "el", "rhel", "rpm");
       } else if (osName.toLowerCase() === "arch") {
-        keywords.push("archlinux", "unknown");
-      } else if (osName.toLowerCase() === "linux") {
-        keywords.push("unknown", "linux");
+        keywords.push("archlinux");
       } else if (osName.toLowerCase() === "freebsd") {
         keywords.push("freebsd");
       } else if (osName.toLowerCase() === "harmonyos") {
@@ -109,8 +107,6 @@ const getKeywords = (
       keywords.push("gnu", "linux", "unknown", "flatpak", "appimage", "pkg");
     }
   }
-
-  keywords.push("tar.gz", "zip", "tar.zst");
   return keywords;
 };
 
@@ -147,5 +143,11 @@ export const getDownloadAsset = (
 
   const { os, arch } = getOSandArch(ua);
   const keywords = getKeywords(os, arch);
-  return searchAsset(keywords, assets);
+  let result = searchAsset(keywords, assets);
+  if (!result) {
+    const compressKeywords = ["tar.gz", "zip", "tar.zst"];
+    result = searchAsset(compressKeywords, assets);
+  }
+
+  return result;
 };
