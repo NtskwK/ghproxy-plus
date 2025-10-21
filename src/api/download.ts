@@ -8,8 +8,7 @@ import { extractRepoFromURL, GHPROXY_PATH, getOSandArch } from "@/lib/utils";
 const PREFIX = "/api/download/";
 
 export async function downloadApi(c: Context) {
-  const headerGetter = c.req.header;
-  const ua = headerGetter("user-agent") || "";
+  const ua = c.req.header("user-agent") || "";
   const urlObj = new URL(c.req.url);
   const keyword = urlObj.searchParams.get("keyword") || "";
 
@@ -40,7 +39,7 @@ export async function downloadApi(c: Context) {
   }
 
   let body: string | null = null;
-  if (headerGetter("content-type")) {
+  if (c.req.header("content-type")) {
     body = await c.req.text();
   }
 
@@ -63,7 +62,7 @@ export async function downloadApi(c: Context) {
       {
         os,
         arch,
-        headersObj: headerGetter,
+        headersObj: c.req.header(),
         error: err,
         requestUrl: url || null
       },
