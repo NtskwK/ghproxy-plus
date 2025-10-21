@@ -2,11 +2,11 @@
   "name": "gpp-hono",
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
+    "dev": "farm start",
+    "dev:wrangler": "wrangler dev",
     "deploy": "pnpm build && wrangler deploy --minify",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "check": "biome check --write",
-    "dev:front": "farm start",
     "build": "farm build",
     "format": "prettier --write .",
     "lint": "eslint .",
@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "@farmfe/js-plugin-postcss": "^1.12.0",
+    "@hono/vite-dev-server": "^0.23.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
