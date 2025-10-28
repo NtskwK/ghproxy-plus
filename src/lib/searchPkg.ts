@@ -30,10 +30,7 @@ const isHashFile = (filename: string): boolean => {
  * @returns Filtered list of assets without hash files
  */
 const filterHashFiles = (assets: GhReleaseAssets[]): GhReleaseAssets[] => {
-  const filtered = assets.filter((asset) => !isHashFile(asset.name));
-  // Return filtered list if it's not empty, otherwise return original list
-  // to avoid returning undefined when only hash files exist
-  return filtered.length > 0 ? filtered : assets;
+  return assets.filter((asset) => !isHashFile(asset.name));
 };
 
 const searchAsset = (
