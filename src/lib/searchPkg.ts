@@ -1,6 +1,41 @@
 import type { GhReleaseAssets } from "./ghResponse";
 import { type CPUArchitecture, getOSandArch } from "./utils";
 
+/**
+ * Check if an asset filename is a hash/checksum file or signature file.
+ * These files should be excluded from auto-selection.
+ * @param filename - The asset filename to check
+ * @returns true if the file is a hash/checksum/signature file
+ */
+const isHashFile = (filename: string): boolean => {
+  const lowerName = filename.toLowerCase();
+  const hashExtensions = [
+    ".md5",
+    ".md5sum",
+    ".sha1",
+    ".sha1sum",
+    ".sha256",
+    ".sha256sum",
+    ".sha512",
+    ".sha512sum",
+    ".asc",
+    ".sig"
+  ];
+  return hashExtensions.some((ext) => lowerName.endsWith(ext));
+};
+
+/**
+ * Filter out hash/checksum files from the assets list.
+ * @param assets - The list of assets to filter
+ * @returns Filtered list of assets without hash files
+ */
+const filterHashFiles = (assets: GhReleaseAssets[]): GhReleaseAssets[] => {
+  const filtered = assets.filter((asset) => !isHashFile(asset.name));
+  // Return filtered list if it's not empty, otherwise return original list
+  // to avoid returning undefined when only hash files exist
+  return filtered.length > 0 ? filtered : assets;
+};
+
 const searchAsset = (
   keywords: string[],
   assets: GhReleaseAssets[]
@@ -9,10 +44,13 @@ const searchAsset = (
     return undefined;
   }
 
+  // Filter out hash files before searching
+  const filteredAssets = filterHashFiles(assets);
+
   const lowerKeywords = keywords.map((k) => k.toLowerCase());
 
   // select assets that match all keywords
-  const fullMatches = assets.filter((asset) => {
+  const fullMatches = filteredAssets.filter((asset) => {
     const lowerName = asset.name.toLowerCase();
     return lowerKeywords.every((keyword) => lowerName.includes(keyword));
   });
@@ -25,7 +63,7 @@ const searchAsset = (
   let bestMatch: GhReleaseAssets | undefined;
   let maxMatches = 0;
 
-  assets.forEach((asset) => {
+  filteredAssets.forEach((asset) => {
     const lowerName = asset.name.toLowerCase();
     const matchCount = lowerKeywords.filter((keyword) =>
       lowerName.includes(keyword)
@@ -119,17 +157,20 @@ export const getDownloadAsset = (
     return undefined;
   }
 
-  if (assets.length <= 2 && ua === undefined && keyword === undefined) {
-    const tarAsset = searchAsset(["tar.gz"], assets);
+  // Filter out hash files from all assets
+  const filteredAssets = filterHashFiles(assets);
+
+  if (filteredAssets.length <= 2 && ua === undefined && keyword === undefined) {
+    const tarAsset = searchAsset(["tar.gz"], filteredAssets);
     if (tarAsset) {
       return tarAsset;
     } else {
-      return assets[0];
+      return filteredAssets[0];
     }
   }
 
   if (keyword) {
-    const asset = searchAsset([keyword], assets);
+    const asset = searchAsset([keyword], filteredAssets);
     if (asset) {
       return asset;
     } else {
@@ -138,15 +179,15 @@ export const getDownloadAsset = (
   }
 
   if (!ua) {
-    return assets[0];
+    return filteredAssets[0];
   }
 
   const { os, arch } = getOSandArch(ua);
   const keywords = getKeywords(os, arch);
-  let result = searchAsset(keywords, assets);
+  let result = searchAsset(keywords, filteredAssets);
   if (!result) {
     const compressKeywords = ["tar.gz", "zip", "tar.zst"];
-    result = searchAsset(compressKeywords, assets);
+    result = searchAsset(compressKeywords, filteredAssets);
   }
 
   return result;
