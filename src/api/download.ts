@@ -1,10 +1,6 @@
 import type { Context } from "hono";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
-import {
-  getDefaultBranchSourceCode,
-  getRepoInfo,
-  getRepoReleases
-} from "@/lib/ghApi";
+import { getRepoReleases } from "@/lib/ghApi";
 import type { GhRelease } from "@/lib/ghResponse";
 import { getDownloadAsset } from "@/lib/searchPkg";
 import { extractRepoFromURL, GHPROXY_PATH, getOSandArch } from "@/lib/utils";
@@ -75,41 +71,11 @@ export async function downloadApi(c: Context) {
   }
 
   if (!releases || releases.length === 0) {
-    // Fallback to default branch source code if no releases found
-    try {
-      const repoInfo = await getRepoInfo(repo.owner, repo.repo, reqInit);
-      const defaultBranch = repoInfo.default_branch;
-      const branchAssets = getDefaultBranchSourceCode(
-        repo.owner,
-        repo.repo,
-        defaultBranch
-      );
-
-      const asset = getDownloadAsset(branchAssets, ua, keyword);
-      if (!asset) {
-        const message = "No suitable asset found.";
-        return c.redirect(
-          new URL(
-            `/api/404?message=${encodeURIComponent(message)}`,
-            urlObj.origin
-          ),
-          302
-        );
-      }
-
-      const downloadUrl =
-        urlObj.origin + GHPROXY_PATH + asset.browser_download_url;
-      return Response.redirect(downloadUrl, 302);
-    } catch (_err) {
-      const message = "No releases found and unable to fetch default branch.";
-      return c.redirect(
-        new URL(
-          `/api/404?message=${encodeURIComponent(message)}`,
-          urlObj.origin
-        ),
-        302
-      );
-    }
+    const message = "No releases found.";
+    return c.redirect(
+      new URL(`/api/404?message=${encodeURIComponent(message)}`, urlObj.origin),
+      302
+    );
   }
 
   const asset = getDownloadAsset(releases[0].assets, ua, keyword);
