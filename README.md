@@ -186,3 +186,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 ## Thanks
 
 [hunshcn/gh-proxy](https://github.com/hunshcn/gh-proxy)
+
