@@ -6,7 +6,6 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 import type * as z from "zod";
 import apiDocumentationUrl from "@/assets/api.md";
-import Combobox from "@/components/combobox";
 import type { CheckFormSchema } from "@/components/lib";
 import MarkdownRenderer from "@/components/markdownRenderer";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -29,6 +28,13 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { getRepoReleases, getSourceCode } from "@/lib/ghApi";
 import type { GhRelease } from "@/lib/ghResponse";
 import { getDownloadAsset } from "@/lib/searchPkg";
@@ -283,24 +289,33 @@ export default function Homepage() {
       <div className="flex flex-col gap-2 space-y-8">
         <div className="space-y-2">
           <Label>Tag</Label>
-          <Combobox
-            getter={{ value: tag }}
-            options={tagList.map((tag) => ({
-              label: tag.label,
-              value: tag.releaseId
-            }))}
-            setter={setTag}
-            defaultValue="Select tag"
-          />
+          <Select value={tag} onValueChange={setTag}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select tag" />
+            </SelectTrigger>
+            <SelectContent>
+              {tagList.map((tag) => (
+                <SelectItem key={tag.releaseId} value={tag.releaseId}>
+                  {tag.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div className="space-y-2">
           <Label>Asset</Label>
-          <Combobox
-            getter={{ value: asset }}
-            options={assetList}
-            setter={setAsset}
-            defaultValue="Select download asset"
-          />
+          <Select value={asset} onValueChange={setAsset}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select download asset" />
+            </SelectTrigger>
+            <SelectContent>
+              {assetList.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <Button
           onClick={handleDownload}
