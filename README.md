@@ -120,6 +120,7 @@ Don't fetch it! You can only access it through the browser.
 - Parses User-Agent to determine OS (Windows, macOS, Linux, Android, iOS, etc.)
 - Detects CPU architecture (x86_64, arm64, etc.)
 - Automatically selects the best matching asset from the latest release
+- Falls back to default branch source code if no releases are found
 - Falls back to first asset if no match found
 
 **Response:**
