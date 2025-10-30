@@ -113,12 +113,13 @@ export default function Homepage() {
         extractRepoFromURL(checkForm.getValues("repoUrl"))?.repo || "",
         release.tag_name
       );
-      release.assets = [...release.assets, ...sourceCodeAssets];
       console.debug("Source code assets:", sourceCodeAssets);
 
-      console.debug("Release assets:", release.assets);
+      // Combine assets without mutating the release object
+      const allAssets = [...release.assets, ...sourceCodeAssets];
+      console.debug("Release assets:", allAssets);
 
-      const assets = release.assets.map((asset) => ({
+      const assets = allAssets.map((asset) => ({
         label: asset.name,
         value: asset.browser_download_url
       }));
@@ -126,7 +127,7 @@ export default function Homepage() {
       setAssetList(assets);
       setAsset(assets[0]?.value || "");
 
-      const downloadAsset = getDownloadAsset(release.assets, ua, keyword);
+      const downloadAsset = getDownloadAsset(allAssets, ua, keyword);
       console.debug("downloadAsset", downloadAsset);
       if (downloadAsset) {
         setAsset(downloadAsset.browser_download_url);
