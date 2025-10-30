@@ -35,7 +35,12 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { getRepoReleases, getSourceCode } from "@/lib/ghApi";
+import {
+  getDefaultBranchSourceCode,
+  getRepoInfo,
+  getRepoReleases,
+  getSourceCode
+} from "@/lib/ghApi";
 import type { GhRelease } from "@/lib/ghResponse";
 import { getDownloadAsset } from "@/lib/searchPkg";
 import { extractRepoFromURL } from "@/lib/utils";
@@ -183,10 +188,43 @@ export default function Homepage() {
     }
 
     getRepoReleases(repo.owner, repo.repo)
-      .then((releases) => {
+      .then(async (releases) => {
         if (releases.length === 0) {
-          setSubmitInfo("❌ No releases found in the repo.");
-          resetAssetAndTag();
+          // Fallback to default branch source code
+          try {
+            const repoInfo = await getRepoInfo(repo.owner, repo.repo);
+            const defaultBranch = repoInfo.default_branch;
+            const branchAssets = getDefaultBranchSourceCode(
+              repo.owner,
+              repo.repo,
+              defaultBranch
+            );
+
+            // Create a pseudo-release for the default branch
+            const pseudoRelease: GhRelease = {
+              id: 0,
+              tag_name: defaultBranch,
+              name: `Default branch (${defaultBranch})`,
+              assets: branchAssets
+            } as GhRelease;
+
+            setTagList([
+              {
+                label: `Default branch (${defaultBranch})`,
+                releaseId: "0"
+              }
+            ]);
+            setTag("0");
+            setReleases([pseudoRelease]);
+            updateSearchParams("repo", values.repoUrl);
+            setSubmitInfo("");
+            sessionStorage.setItem(repoKey, JSON.stringify([pseudoRelease]));
+          } catch (error) {
+            setSubmitInfo(
+              `❌ No releases found and unable to fetch default branch: ${error}`
+            );
+            resetAssetAndTag();
+          }
           return;
         }
         const tagNames = releases.map((release) => ({

@@ -122,6 +122,8 @@ Don't fetch it! You can only access it through the browser.
 - Automatically selects the best matching asset from the latest release
 - Falls back to first asset if no match found
 
+**Note:** The web UI provides an option to generate download URLs from the default branch when no releases are found.
+
 **Response:**
 
 - Success (302): Redirects to the download URL via `/api/ghproxy/`
@@ -184,3 +186,4 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 ## Thanks
 
 [hunshcn/gh-proxy](https://github.com/hunshcn/gh-proxy)
+

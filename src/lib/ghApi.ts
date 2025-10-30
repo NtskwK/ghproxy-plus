@@ -1,5 +1,10 @@
 import { LRUCache } from "lru-cache";
-import type { GhRelease, GhReleaseAssets, GhTag } from "./ghResponse";
+import type {
+  GhRelease,
+  GhReleaseAssets,
+  GhRepoInfo,
+  GhTag
+} from "./ghResponse";
 import { type ErrorWithUrl, isServer } from "./utils";
 
 interface ReleasesCache {
@@ -115,4 +120,59 @@ const getLatestRelease = async (
   return releases[0] || null;
 };
 
-export { getRepoTags, getRepoReleases, getLatestRelease, getSourceCode };
+const getRepoInfo = async (
+  owner: string,
+  repo: string,
+  reqInit: RequestInit = {}
+): Promise<GhRepoInfo> => {
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}`,
+      reqInit
+    );
+  } catch (e) {
+    (e as ErrorWithUrl).url = `https://api.github.com/repos/${owner}/${repo}`;
+    throw e;
+  }
+
+  if (!response.ok) {
+    const errorData = (await response.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    const error = new Error(
+      `Network response was not ok: ${response.status}`
+    ) as GhApiError;
+    error.status = response.status;
+    error.response = response;
+    error.data = errorData;
+    throw error;
+  }
+
+  const data = (await response.json()) as GhRepoInfo;
+  return data;
+};
+
+const getDefaultBranchSourceCode = (
+  owner: string,
+  repo: string,
+  branch: string
+): GhReleaseAssets[] => {
+  // https://github.com/owner/repo/archive/refs/heads/main.zip
+  const suffixes = [".tar.gz", ".zip"];
+  const assets = suffixes.map((suffix) => ({
+    name: `SourceCode-${branch}${suffix}`,
+    browser_download_url: `https://github.com/${owner}/${repo}/archive/refs/heads/${branch}${suffix}`
+  })) as GhReleaseAssets[];
+  return assets;
+};
+
+export {
+  getRepoTags,
+  getRepoReleases,
+  getLatestRelease,
+  getSourceCode,
+  getRepoInfo,
+  getDefaultBranchSourceCode
+};

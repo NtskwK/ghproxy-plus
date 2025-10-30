@@ -71,3 +71,12 @@ export interface GhTag {
   };
   node_id: string;
 }
+
+export interface GhRepoInfo {
+  name: string;
+  full_name: string;
+  owner: GhUser;
+  default_branch: string;
+  description: string;
+  html_url: string;
+}
