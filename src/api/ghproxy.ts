@@ -1,7 +1,5 @@
 // https://github.com/hunshcn/gh-proxy
 
-import type { Context, HonoRequest } from "hono";
-
 // MIT License
 // Copyright (c) 2020 hunshcn
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,6 +19,8 @@ import type { Context, HonoRequest } from "hono";
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+import type { Context, HonoRequest } from "hono";
 
 // 前缀，如果自定义路由为example.com/gh/*，将PREFIX改为 '/gh/'，注意，少一个杠都会错！
 const GHPROXY_PATH = "/api/ghproxy/";

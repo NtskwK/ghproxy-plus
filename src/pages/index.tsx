@@ -38,8 +38,7 @@ import {
 import {
   getDefaultBranchSourceCode,
   getRepoInfo,
-  getRepoReleases,
-  getSourceCode
+  getRepoReleases
 } from "@/lib/ghApi";
 import type { GhRelease } from "@/lib/ghResponse";
 import { getDownloadAsset } from "@/lib/searchPkg";
@@ -124,7 +123,7 @@ export default function Homepage() {
         setAsset(downloadAsset.browser_download_url);
       }
     }
-  }, [tag, releases, ua, keyword, checkForm]);
+  }, [tag, releases, ua, keyword]);
 
   useEffect(() => {
     if (tag && tag !== "None" && tag !== "" && releases.length > 0) {
@@ -163,7 +162,7 @@ export default function Homepage() {
     const repoKey = `${repo.owner}/${repo.repo}`;
 
     // 刷新时清除 sessionStorage
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       sessionStorage.clear();
     });
 
@@ -184,7 +183,10 @@ export default function Homepage() {
       return;
     }
 
-    const genFakeRepoReleases = async (owner: string, repo: string): Promise<GhRelease> => {
+    const genFakeRepoReleases = async (
+      owner: string,
+      repo: string
+    ): Promise<GhRelease> => {
       const repoInfo = await getRepoInfo(owner, repo);
       const defaultBranch = repoInfo.default_branch;
       const fakeAssets = getDefaultBranchSourceCode(owner, repo, defaultBranch);
@@ -195,7 +197,7 @@ export default function Homepage() {
         name: `Default branch - ${defaultBranch}`
       };
       return fakeRelease;
-    }
+    };
 
     getRepoReleases(repo.owner, repo.repo)
       .then(async (releases) => {
