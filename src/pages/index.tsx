@@ -107,19 +107,10 @@ export default function Homepage() {
 
     console.log("Processing tag:", tag);
     const release = releases.find((release) => release.id.toString() === tag);
+    console.debug("Selected release:", release);
     if (release) {
-      const sourceCodeAssets = getSourceCode(
-        extractRepoFromURL(checkForm.getValues("repoUrl"))?.owner || "",
-        extractRepoFromURL(checkForm.getValues("repoUrl"))?.repo || "",
-        release.tag_name
-      );
-      console.debug("Source code assets:", sourceCodeAssets);
-
-      // Combine assets without mutating the release object
-      const allAssets = [...release.assets, ...sourceCodeAssets];
-      console.debug("Release assets:", allAssets);
-
-      const assets = allAssets.map((asset) => ({
+      console.debug("Release assets:", release.assets);
+      const assets = release.assets.map((asset) => ({
         label: asset.name,
         value: asset.browser_download_url
       }));
@@ -127,9 +118,9 @@ export default function Homepage() {
       setAssetList(assets);
       setAsset(assets[0]?.value || "");
 
-      const downloadAsset = getDownloadAsset(allAssets, ua, keyword);
-      console.debug("downloadAsset", downloadAsset);
+      const downloadAsset = getDownloadAsset(release.assets, ua, keyword);
       if (downloadAsset) {
+        console.debug("set downloadAsset:", downloadAsset);
         setAsset(downloadAsset.browser_download_url);
       }
     }
@@ -171,6 +162,11 @@ export default function Homepage() {
 
     const repoKey = `${repo.owner}/${repo.repo}`;
 
+    // 刷新时清除 sessionStorage
+    window.addEventListener('beforeunload', () => {
+      sessionStorage.clear();
+    });
+
     const cached = sessionStorage.getItem(repoKey);
     if (cached) {
       const releases = JSON.parse(cached) as GhRelease[];
@@ -188,45 +184,31 @@ export default function Homepage() {
       return;
     }
 
+    const genFakeRepoReleases = async (owner: string, repo: string): Promise<GhRelease> => {
+      const repoInfo = await getRepoInfo(owner, repo);
+      const defaultBranch = repoInfo.default_branch;
+      const fakeAssets = getDefaultBranchSourceCode(owner, repo, defaultBranch);
+      const fakeRelease: GhRelease = {
+        tag_name: defaultBranch,
+        assets: fakeAssets,
+        id: 0,
+        name: `Default branch - ${defaultBranch}`
+      };
+      return fakeRelease;
+    }
+
     getRepoReleases(repo.owner, repo.repo)
       .then(async (releases) => {
         if (releases.length === 0) {
-          // Fallback to default branch source code
           try {
-            const repoInfo = await getRepoInfo(repo.owner, repo.repo);
-            const defaultBranch = repoInfo.default_branch;
-            const branchAssets = getDefaultBranchSourceCode(
-              repo.owner,
-              repo.repo,
-              defaultBranch
-            );
-
-            // Create a pseudo-release for the default branch
-            const pseudoRelease: GhRelease = {
-              id: 0,
-              tag_name: defaultBranch,
-              name: `Default branch (${defaultBranch})`,
-              assets: branchAssets
-            } as GhRelease;
-
-            setTagList([
-              {
-                label: `Default branch (${defaultBranch})`,
-                releaseId: "0"
-              }
-            ]);
-            setTag("0");
-            setReleases([pseudoRelease]);
-            updateSearchParams("repo", values.repoUrl);
-            setSubmitInfo("");
-            sessionStorage.setItem(repoKey, JSON.stringify([pseudoRelease]));
+            releases = [await genFakeRepoReleases(repo.owner, repo.repo)];
           } catch (error) {
             setSubmitInfo(
               `❌ No releases found and unable to fetch default branch: ${error}`
             );
             resetAssetAndTag();
+            return;
           }
-          return;
         }
         const tagNames = releases.map((release) => ({
           label: release.name,

@@ -38,27 +38,27 @@ export interface GhReleaseAssets {
 }
 
 export interface GhRelease {
-  url: string;
-  assets_url: string;
-  upload_url: string;
-  html_url: string;
   id: number;
-  author: GhUser;
-  node_id: string;
-  tag_name: string;
-  target_commitish: string;
   name: string;
-  draft: boolean;
-  immutable: boolean;
-  prerelease: boolean;
-  created_at: string;
-  updated_at: string;
-  published_at: string;
+  tag_name: string;
   assets: GhReleaseAssets[];
-  tarball_url: string;
-  zipball_url: string;
-  body: string;
-  mentions_count: number;
+  url?: string;
+  assets_url?: string;
+  upload_url?: string;
+  html_url?: string;
+  author?: GhUser;
+  node_id?: string;
+  target_commitish?: string;
+  draft?: boolean;
+  immutable?: boolean;
+  prerelease?: boolean;
+  created_at?: string;
+  updated_at?: string;
+  published_at?: string;
+  tarball_url?: string;
+  zipball_url?: string;
+  body?: string;
+  mentions_count?: number;
 }
 
 export interface GhTag {

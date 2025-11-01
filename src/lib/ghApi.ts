@@ -90,12 +90,19 @@ const getRepoReleases = async (
   }
 
   const data = (await response.json()) as GhRelease[];
+
+  const releases = data.map((release) => {
+    release.assets = [...release.assets, ...getSourceCode(owner, repo, release.tag_name)];
+    return release;
+  });
+
   if (isServer) {
     cache.set(`${owner}/${repo}`, {
-      releases: data
+      releases: releases
     });
   }
-  return data;
+
+  return releases;
 };
 
 const getSourceCode = (
